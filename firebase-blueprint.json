@@ -1,0 +1,337 @@
+{
+  "entities": {
+    "SiteSettings": {
+      "title": "SiteSettings",
+      "description": "Global university profile settings managed via the CMS.",
+      "type": "object",
+      "properties": {
+        "institutionName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "heroTitle": { "type": "string", "minLength": 5, "maxLength": 180 },
+        "heroSubtitle": { "type": "string", "minLength": 10, "maxLength": 400 },
+        "admissionsOpen": { "type": "boolean" },
+        "admissionsLabel": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "vision": { "type": "string", "minLength": 10, "maxLength": 600 },
+        "mission": { "type": "string", "minLength": 10, "maxLength": 1200 },
+        "rectorName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "rectorTitle": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "rectorMessage": { "type": "string", "minLength": 10, "maxLength": 1000 },
+        "address": { "type": "string", "minLength": 5, "maxLength": 300 },
+        "phone": { "type": "string", "minLength": 5, "maxLength": 40 },
+        "email": { "type": "string", "minLength": 5, "maxLength": 120 },
+        "socialInstagram": { "type": "string", "minLength": 0, "maxLength": 300, "pattern": "^(|https?://.+)$" },
+        "socialFacebook": { "type": "string", "minLength": 0, "maxLength": 300, "pattern": "^(|https?://.+)$" },
+        "socialTwitter": { "type": "string", "minLength": 0, "maxLength": 300, "pattern": "^(|https?://.+)$" },
+        "socialYoutube": { "type": "string", "minLength": 0, "maxLength": 300, "pattern": "^(|https?://.+)$" },
+        "updatedBy": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "institutionName",
+        "heroTitle",
+        "heroSubtitle",
+        "admissionsOpen",
+        "admissionsLabel",
+        "vision",
+        "mission",
+        "rectorName",
+        "rectorTitle",
+        "rectorMessage",
+        "address",
+        "phone",
+        "email",
+        "updatedBy",
+        "updatedAt"
+      ]
+    },
+    "AcademicProgram": {
+      "title": "AcademicProgram",
+      "description": "University academic degree program listed on the landing page and managed in CMS.",
+      "type": "object",
+      "properties": {
+        "code": { "type": "string", "minLength": 2, "maxLength": 24, "pattern": "^[A-Z0-9\\-]+$" },
+        "name": { "type": "string", "minLength": 3, "maxLength": 140 },
+        "degree": { "type": "string", "enum": ["S1", "S2"] },
+        "faculty": { "type": "string", "minLength": 3, "maxLength": 120 },
+        "accreditation": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "duration": { "type": "string", "minLength": 2, "maxLength": 40 },
+        "credits": { "type": "integer" },
+        "summary": { "type": "string", "minLength": 10, "maxLength": 500 },
+        "careerOutcomes": { "type": "string", "minLength": 5, "maxLength": 500 },
+        "featured": { "type": "boolean" },
+        "active": { "type": "boolean" },
+        "authorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "code",
+        "name",
+        "degree",
+        "faculty",
+        "accreditation",
+        "duration",
+        "credits",
+        "summary",
+        "careerOutcomes",
+        "featured",
+        "active",
+        "authorId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Post": {
+      "title": "Post",
+      "description": "University news, scholarly article, or official announcement managed in CMS.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 4, "maxLength": 180 },
+        "slug": { "type": "string", "minLength": 3, "maxLength": 140, "pattern": "^[a-z0-9\\-]+$" },
+        "category": { "type": "string", "enum": ["news", "article", "announcement"] },
+        "excerpt": { "type": "string", "minLength": 10, "maxLength": 400 },
+        "content": { "type": "string", "minLength": 20, "maxLength": 12000 },
+        "coverImage": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "authorName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "status": { "type": "string", "enum": ["draft", "published"] },
+        "priority": { "type": "string", "enum": ["normal", "important", "urgent"] },
+        "featured": { "type": "boolean" },
+        "views": { "type": "integer" },
+        "publishedDate": { "type": "string", "minLength": 8, "maxLength": 32 },
+        "authorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "title",
+        "slug",
+        "category",
+        "excerpt",
+        "content",
+        "coverImage",
+        "authorName",
+        "status",
+        "priority",
+        "featured",
+        "views",
+        "publishedDate",
+        "authorId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AgendaEvent": {
+      "title": "AgendaEvent",
+      "description": "Scheduled campus event, seminar, or academic calendar item.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 4, "maxLength": 160 },
+        "eventDate": { "type": "string", "minLength": 8, "maxLength": 32 },
+        "timeRange": { "type": "string", "minLength": 4, "maxLength": 60 },
+        "location": { "type": "string", "minLength": 3, "maxLength": 160 },
+        "organizer": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "category": { "type": "string", "enum": ["academic", "admissions", "seminar", "student-life"] },
+        "description": { "type": "string", "minLength": 10, "maxLength": 1200 },
+        "status": { "type": "string", "enum": ["upcoming", "ongoing", "completed"] },
+        "active": { "type": "boolean" },
+        "authorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "title",
+        "eventDate",
+        "timeRange",
+        "location",
+        "organizer",
+        "category",
+        "description",
+        "status",
+        "active",
+        "authorId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AlumniTestimonial": {
+      "title": "AlumniTestimonial",
+      "description": "Verified alumni testimonial and graduate outcome record.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "graduationYear": { "type": "integer" },
+        "program": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "role": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "organization": { "type": "string", "minLength": 2, "maxLength": 140 },
+        "quote": { "type": "string", "minLength": 15, "maxLength": 800 },
+        "featured": { "type": "boolean" },
+        "active": { "type": "boolean" },
+        "authorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "name",
+        "graduationYear",
+        "program",
+        "role",
+        "organization",
+        "quote",
+        "featured",
+        "active",
+        "authorId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "CampusNotification": {
+      "title": "CampusNotification",
+      "description": "Real-time campus broadcast notification delivered via Firestore onSnapshot.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 3, "maxLength": 140 },
+        "message": { "type": "string", "minLength": 5, "maxLength": 400 },
+        "type": { "type": "string", "enum": ["announcement", "agenda", "news", "urgent"] },
+        "targetSection": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "active": { "type": "boolean" },
+        "authorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "title",
+        "message",
+        "type",
+        "targetSection",
+        "active",
+        "authorId",
+        "createdAt"
+      ]
+    },
+    "DailyAnalytics": {
+      "title": "DailyAnalytics",
+      "description": "Daily aggregated site analytics metrics for the admin dashboard.",
+      "type": "object",
+      "properties": {
+        "dateLabel": { "type": "string", "minLength": 4, "maxLength": 20 },
+        "isoDate": { "type": "string", "minLength": 10, "maxLength": 10, "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "visitors": { "type": "integer" },
+        "pageViews": { "type": "integer" },
+        "searches": { "type": "integer" },
+        "programViews": { "type": "integer" },
+        "mobileShare": { "type": "integer" },
+        "authorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "dateLabel",
+        "isoDate",
+        "visitors",
+        "pageViews",
+        "searches",
+        "programViews",
+        "mobileShare",
+        "authorId",
+        "updatedAt"
+      ]
+    },
+    "AnalyticsEvent": {
+      "title": "AnalyticsEvent",
+      "description": "Authenticated user activity event recorded for real-time site analytics.",
+      "type": "object",
+      "properties": {
+        "eventType": { "type": "string", "enum": ["page_view", "search", "article_read", "program_view", "map_interact"] },
+        "label": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "actorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["eventType", "label", "actorId", "createdAt"]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Authorized CMS administrator profile.",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "role": { "type": "string", "enum": ["super_admin", "editor"] },
+        "addedBy": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["displayName", "role", "addedBy", "createdAt"]
+    },
+    "GalleryPhoto": {
+      "title": "GalleryPhoto",
+      "description": "Campus life photograph displayed in the interactive landing page gallery carousel.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 3, "maxLength": 140 },
+        "caption": { "type": "string", "minLength": 5, "maxLength": 320 },
+        "category": { "type": "string", "enum": ["campus", "academics", "student-life", "events"] },
+        "imageUrl": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 350000,
+          "pattern": "^(https?://.+|/[^\\s]+|data:image/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/=]+)$"
+        },
+        "photographer": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "displayOrder": { "type": "integer" },
+        "active": { "type": "boolean" },
+        "authorId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "title",
+        "caption",
+        "category",
+        "imageUrl",
+        "photographer",
+        "displayOrder",
+        "active",
+        "authorId",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/site_settings/{settingId}": {
+      "schema": { "$ref": "#/entities/SiteSettings" },
+      "description": "Global university profile configuration."
+    },
+    "/programs/{programId}": {
+      "schema": { "$ref": "#/entities/AcademicProgram" },
+      "description": "Academic degree programs offered by the university."
+    },
+    "/posts/{postId}": {
+      "schema": { "$ref": "#/entities/Post" },
+      "description": "Published and draft news, articles, and announcements."
+    },
+    "/agenda/{agendaId}": {
+      "schema": { "$ref": "#/entities/AgendaEvent" },
+      "description": "Campus events and academic calendar agenda items."
+    },
+    "/testimonials/{testimonialId}": {
+      "schema": { "$ref": "#/entities/AlumniTestimonial" },
+      "description": "Alumni testimonials and graduate stories."
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/CampusNotification" },
+      "description": "Real-time campus broadcast notifications."
+    },
+    "/analytics_daily/{dayId}": {
+      "schema": { "$ref": "#/entities/DailyAnalytics" },
+      "description": "Daily site traffic and engagement analytics."
+    },
+    "/analytics_events/{eventId}": {
+      "schema": { "$ref": "#/entities/AnalyticsEvent" },
+      "description": "Live authenticated interaction events."
+    },
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "Registered CMS administrator UIDs."
+    },
+    "/gallery_photos/{photoId}": {
+      "schema": { "$ref": "#/entities/GalleryPhoto" },
+      "description": "Campus life photo gallery items managed in the CMS."
+    }
+  }
+}

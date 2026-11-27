@@ -1,0 +1,444 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Primitive Helpers ---
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isBootstrappedAdmin() {
+      return isVerified() && request.auth.token.email == 'fathurelgani@gmail.com';
+    }
+
+    function isAdmin() {
+      return isBootstrappedAdmin() ||
+        (isVerified() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isValidOptionalUrl(val) {
+      return val is string && val.size() <= 300 && (val == '' || val.matches('^https?://.+'));
+    }
+
+    // --- Validation Blueprints (verbatim bounds from firebase-blueprint.json) ---
+    function isValidSiteSettings(data) {
+      return data.keys().hasAll([
+          'institutionName', 'heroTitle', 'heroSubtitle', 'admissionsOpen', 'admissionsLabel',
+          'vision', 'mission', 'rectorName', 'rectorTitle', 'rectorMessage',
+          'address', 'phone', 'email', 'updatedBy', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'institutionName', 'heroTitle', 'heroSubtitle', 'admissionsOpen', 'admissionsLabel',
+          'vision', 'mission', 'rectorName', 'rectorTitle', 'rectorMessage',
+          'address', 'phone', 'email',
+          'socialInstagram', 'socialFacebook', 'socialTwitter', 'socialYoutube',
+          'updatedBy', 'updatedAt'
+        ]) &&
+        data.institutionName is string && data.institutionName.size() >= 2 && data.institutionName.size() <= 120 &&
+        data.heroTitle is string && data.heroTitle.size() >= 5 && data.heroTitle.size() <= 180 &&
+        data.heroSubtitle is string && data.heroSubtitle.size() >= 10 && data.heroSubtitle.size() <= 400 &&
+        data.admissionsOpen is bool &&
+        data.admissionsLabel is string && data.admissionsLabel.size() >= 2 && data.admissionsLabel.size() <= 120 &&
+        data.vision is string && data.vision.size() >= 10 && data.vision.size() <= 600 &&
+        data.mission is string && data.mission.size() >= 10 && data.mission.size() <= 1200 &&
+        data.rectorName is string && data.rectorName.size() >= 2 && data.rectorName.size() <= 120 &&
+        data.rectorTitle is string && data.rectorTitle.size() >= 2 && data.rectorTitle.size() <= 120 &&
+        data.rectorMessage is string && data.rectorMessage.size() >= 10 && data.rectorMessage.size() <= 1000 &&
+        data.address is string && data.address.size() >= 5 && data.address.size() <= 300 &&
+        data.phone is string && data.phone.size() >= 5 && data.phone.size() <= 40 &&
+        data.email is string && data.email.size() >= 5 && data.email.size() <= 120 &&
+        (!('socialInstagram' in data) || isValidOptionalUrl(data.socialInstagram)) &&
+        (!('socialFacebook' in data) || isValidOptionalUrl(data.socialFacebook)) &&
+        (!('socialTwitter' in data) || isValidOptionalUrl(data.socialTwitter)) &&
+        (!('socialYoutube' in data) || isValidOptionalUrl(data.socialYoutube)) &&
+        isValidId(data.updatedBy) && data.updatedBy == request.auth.uid &&
+        data.updatedAt is timestamp && data.updatedAt == request.time;
+    }
+
+    function isValidProgram(data) {
+      return data.keys().hasAll([
+          'code', 'name', 'degree', 'faculty', 'accreditation', 'duration',
+          'credits', 'summary', 'careerOutcomes', 'featured', 'active', 'authorId', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'code', 'name', 'degree', 'faculty', 'accreditation', 'duration',
+          'credits', 'summary', 'careerOutcomes', 'featured', 'active', 'authorId', 'createdAt', 'updatedAt'
+        ]) &&
+        data.code is string && data.code.size() >= 2 && data.code.size() <= 24 && data.code.matches('^[A-Z0-9\\-]+$') &&
+        data.name is string && data.name.size() >= 3 && data.name.size() <= 140 &&
+        data.degree in ['S1', 'S2'] &&
+        data.faculty is string && data.faculty.size() >= 3 && data.faculty.size() <= 120 &&
+        data.accreditation is string && data.accreditation.size() >= 1 && data.accreditation.size() <= 40 &&
+        data.duration is string && data.duration.size() >= 2 && data.duration.size() <= 40 &&
+        data.credits is int && data.credits >= 24 && data.credits <= 200 &&
+        data.summary is string && data.summary.size() >= 10 && data.summary.size() <= 500 &&
+        data.careerOutcomes is string && data.careerOutcomes.size() >= 5 && data.careerOutcomes.size() <= 500 &&
+        data.featured is bool &&
+        data.active is bool &&
+        isValidId(data.authorId) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidPost(data) {
+      return data.keys().hasAll([
+          'title', 'slug', 'category', 'excerpt', 'content', 'coverImage',
+          'authorName', 'status', 'priority', 'featured', 'views', 'publishedDate',
+          'authorId', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'title', 'slug', 'category', 'excerpt', 'content', 'coverImage',
+          'authorName', 'status', 'priority', 'featured', 'views', 'publishedDate',
+          'authorId', 'createdAt', 'updatedAt'
+        ]) &&
+        data.title is string && data.title.size() >= 4 && data.title.size() <= 180 &&
+        data.slug is string && data.slug.size() >= 3 && data.slug.size() <= 140 && data.slug.matches('^[a-z0-9\\-]+$') &&
+        data.category in ['news', 'article', 'announcement'] &&
+        data.excerpt is string && data.excerpt.size() >= 10 && data.excerpt.size() <= 400 &&
+        data.content is string && data.content.size() >= 20 && data.content.size() <= 12000 &&
+        data.coverImage is string && data.coverImage.size() >= 1 && data.coverImage.size() <= 500 &&
+        data.authorName is string && data.authorName.size() >= 2 && data.authorName.size() <= 100 &&
+        data.status in ['draft', 'published'] &&
+        data.priority in ['normal', 'important', 'urgent'] &&
+        data.featured is bool &&
+        data.views is int && data.views >= 0 && data.views <= 10000000 &&
+        data.publishedDate is string && data.publishedDate.size() >= 8 && data.publishedDate.size() <= 32 &&
+        isValidId(data.authorId) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidAgenda(data) {
+      return data.keys().hasAll([
+          'title', 'eventDate', 'timeRange', 'location', 'organizer',
+          'category', 'description', 'status', 'active', 'authorId', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'title', 'eventDate', 'timeRange', 'location', 'organizer',
+          'category', 'description', 'status', 'active', 'authorId', 'createdAt', 'updatedAt'
+        ]) &&
+        data.title is string && data.title.size() >= 4 && data.title.size() <= 160 &&
+        data.eventDate is string && data.eventDate.size() >= 8 && data.eventDate.size() <= 32 &&
+        data.timeRange is string && data.timeRange.size() >= 4 && data.timeRange.size() <= 60 &&
+        data.location is string && data.location.size() >= 3 && data.location.size() <= 160 &&
+        data.organizer is string && data.organizer.size() >= 2 && data.organizer.size() <= 120 &&
+        data.category in ['academic', 'admissions', 'seminar', 'student-life'] &&
+        data.description is string && data.description.size() >= 10 && data.description.size() <= 1200 &&
+        data.status in ['upcoming', 'ongoing', 'completed'] &&
+        data.active is bool &&
+        isValidId(data.authorId) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidTestimonial(data) {
+      return data.keys().hasAll([
+          'name', 'graduationYear', 'program', 'role', 'organization',
+          'quote', 'featured', 'active', 'authorId', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'name', 'graduationYear', 'program', 'role', 'organization',
+          'quote', 'featured', 'active', 'authorId', 'createdAt', 'updatedAt'
+        ]) &&
+        data.name is string && data.name.size() >= 2 && data.name.size() <= 120 &&
+        data.graduationYear is int && data.graduationYear >= 1980 && data.graduationYear <= 2035 &&
+        data.program is string && data.program.size() >= 2 && data.program.size() <= 120 &&
+        data.role is string && data.role.size() >= 2 && data.role.size() <= 120 &&
+        data.organization is string && data.organization.size() >= 2 && data.organization.size() <= 140 &&
+        data.quote is string && data.quote.size() >= 15 && data.quote.size() <= 800 &&
+        data.featured is bool &&
+        data.active is bool &&
+        isValidId(data.authorId) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidNotification(data) {
+      return data.keys().hasAll([
+          'title', 'message', 'type', 'targetSection', 'active', 'authorId', 'createdAt'
+        ]) &&
+        data.keys().hasOnly([
+          'title', 'message', 'type', 'targetSection', 'active', 'authorId', 'createdAt'
+        ]) &&
+        data.title is string && data.title.size() >= 3 && data.title.size() <= 140 &&
+        data.message is string && data.message.size() >= 5 && data.message.size() <= 400 &&
+        data.type in ['announcement', 'agenda', 'news', 'urgent'] &&
+        data.targetSection is string && data.targetSection.size() >= 1 && data.targetSection.size() <= 60 &&
+        data.active is bool &&
+        isValidId(data.authorId) &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidDailyAnalytics(data) {
+      return data.keys().hasAll([
+          'dateLabel', 'isoDate', 'visitors', 'pageViews', 'searches',
+          'programViews', 'mobileShare', 'authorId', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'dateLabel', 'isoDate', 'visitors', 'pageViews', 'searches',
+          'programViews', 'mobileShare', 'authorId', 'updatedAt'
+        ]) &&
+        data.dateLabel is string && data.dateLabel.size() >= 4 && data.dateLabel.size() <= 20 &&
+        data.isoDate is string && data.isoDate.size() == 10 && data.isoDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') &&
+        data.visitors is int && data.visitors >= 0 && data.visitors <= 1000000 &&
+        data.pageViews is int && data.pageViews >= 0 && data.pageViews <= 5000000 &&
+        data.searches is int && data.searches >= 0 && data.searches <= 1000000 &&
+        data.programViews is int && data.programViews >= 0 && data.programViews <= 1000000 &&
+        data.mobileShare is int && data.mobileShare >= 0 && data.mobileShare <= 100 &&
+        isValidId(data.authorId) &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidAnalyticsEvent(data) {
+      return data.keys().hasAll(['eventType', 'label', 'actorId', 'createdAt']) &&
+        data.keys().hasOnly(['eventType', 'label', 'actorId', 'createdAt']) &&
+        data.eventType in ['page_view', 'search', 'article_read', 'program_view', 'map_interact'] &&
+        data.label is string && data.label.size() >= 1 && data.label.size() <= 160 &&
+        isValidId(data.actorId) && data.actorId == request.auth.uid &&
+        data.createdAt is timestamp && data.createdAt == request.time;
+    }
+
+    function isValidAdminUser(data) {
+      return data.keys().hasAll(['displayName', 'role', 'addedBy', 'createdAt']) &&
+        data.keys().hasOnly(['displayName', 'role', 'addedBy', 'createdAt']) &&
+        data.displayName is string && data.displayName.size() >= 2 && data.displayName.size() <= 120 &&
+        data.role in ['super_admin', 'editor'] &&
+        isValidId(data.addedBy) &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidGalleryImageUrl(val) {
+      return val is string &&
+        val.size() >= 1 &&
+        val.size() <= 350000 &&
+        (
+          val.matches('^https?://.+') ||
+          val.matches('^/[^\\s]+') ||
+          val.matches('^data:image/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/=]+$')
+        );
+    }
+
+    function isValidGalleryPhoto(data) {
+      return data.keys().hasAll([
+          'title', 'caption', 'category', 'imageUrl', 'photographer',
+          'displayOrder', 'active', 'authorId', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'title', 'caption', 'category', 'imageUrl', 'photographer',
+          'displayOrder', 'active', 'authorId', 'createdAt', 'updatedAt'
+        ]) &&
+        data.title is string && data.title.size() >= 3 && data.title.size() <= 140 &&
+        data.caption is string && data.caption.size() >= 5 && data.caption.size() <= 320 &&
+        data.category in ['campus', 'academics', 'student-life', 'events'] &&
+        isValidGalleryImageUrl(data.imageUrl) &&
+        data.photographer is string && data.photographer.size() >= 2 && data.photographer.size() <= 100 &&
+        data.displayOrder is int && data.displayOrder >= 0 && data.displayOrder <= 1000 &&
+        data.active is bool &&
+        isValidId(data.authorId) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    // --- Collection Rules ---
+
+    match /site_settings/{settingId} {
+      allow get: if isValidId(settingId);
+      allow list: if isBootstrappedAdmin();
+      allow create: if isSignedIn() && isValidId(settingId) && isValidSiteSettings(incoming()) && isAdmin();
+      allow update: if isSignedIn() && isValidId(settingId) && isValidSiteSettings(incoming()) && isAdmin() &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'institutionName', 'heroTitle', 'heroSubtitle', 'admissionsOpen', 'admissionsLabel',
+          'vision', 'mission', 'rectorName', 'rectorTitle', 'rectorMessage',
+          'address', 'phone', 'email',
+          'socialInstagram', 'socialFacebook', 'socialTwitter', 'socialYoutube',
+          'updatedBy', 'updatedAt'
+        ]);
+      allow delete: if false;
+    }
+
+    match /programs/{programId} {
+      allow get: if isValidId(programId) && (existing().active == true || isAdmin());
+      allow list: if resource.data.active == true || isBootstrappedAdmin();
+      allow create: if isSignedIn() && isValidId(programId) && isValidProgram(incoming()) &&
+        incoming().authorId == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        isAdmin();
+      allow update: if isSignedIn() && isValidId(programId) && isValidProgram(incoming()) &&
+        incoming().authorId == existing().authorId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'code', 'name', 'degree', 'faculty', 'accreditation', 'duration',
+          'credits', 'summary', 'careerOutcomes', 'featured', 'active', 'updatedAt'
+        ]) &&
+        isAdmin();
+      allow delete: if isSignedIn() && isValidId(programId) && isAdmin();
+    }
+
+    match /posts/{postId} {
+      allow get: if isValidId(postId) && (existing().status == 'published' || isAdmin());
+      allow list: if resource.data.status == 'published' || isBootstrappedAdmin();
+      allow create: if isSignedIn() && isValidId(postId) && isValidPost(incoming()) &&
+        incoming().authorId == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        isAdmin();
+      allow update: if isSignedIn() && isValidId(postId) && isValidPost(incoming()) &&
+        incoming().authorId == existing().authorId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          (
+            isAdmin() &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'title', 'slug', 'category', 'excerpt', 'content', 'coverImage',
+              'authorName', 'status', 'priority', 'featured', 'views', 'publishedDate', 'updatedAt'
+            ])
+          ) || (
+            isVerified() &&
+            existing().status == 'published' &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['views', 'updatedAt']) &&
+            incoming().views == existing().views + 1
+          )
+        );
+      allow delete: if isSignedIn() && isValidId(postId) && isAdmin();
+    }
+
+    match /agenda/{agendaId} {
+      allow get: if isValidId(agendaId) && (existing().active == true || isAdmin());
+      allow list: if resource.data.active == true || isBootstrappedAdmin();
+      allow create: if isSignedIn() && isValidId(agendaId) && isValidAgenda(incoming()) &&
+        incoming().authorId == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        isAdmin();
+      allow update: if isSignedIn() && isValidId(agendaId) && isValidAgenda(incoming()) &&
+        incoming().authorId == existing().authorId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'title', 'eventDate', 'timeRange', 'location', 'organizer',
+          'category', 'description', 'status', 'active', 'updatedAt'
+        ]) &&
+        (existing().status != 'completed' || isAdmin()) &&
+        isAdmin();
+      allow delete: if isSignedIn() && isValidId(agendaId) && isAdmin();
+    }
+
+    match /testimonials/{testimonialId} {
+      allow get: if isValidId(testimonialId) && (existing().active == true || isAdmin());
+      allow list: if resource.data.active == true || isBootstrappedAdmin();
+      allow create: if isSignedIn() && isValidId(testimonialId) && isValidTestimonial(incoming()) &&
+        incoming().authorId == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        isAdmin();
+      allow update: if isSignedIn() && isValidId(testimonialId) && isValidTestimonial(incoming()) &&
+        incoming().authorId == existing().authorId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'name', 'graduationYear', 'program', 'role', 'organization',
+          'quote', 'featured', 'active', 'updatedAt'
+        ]) &&
+        isAdmin();
+      allow delete: if isSignedIn() && isValidId(testimonialId) && isAdmin();
+    }
+
+    match /notifications/{notificationId} {
+      allow get: if isValidId(notificationId) && (existing().active == true || isAdmin());
+      allow list: if resource.data.active == true || isBootstrappedAdmin();
+      allow create: if isSignedIn() && isValidId(notificationId) && isValidNotification(incoming()) &&
+        incoming().authorId == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        isAdmin();
+      allow update: if isSignedIn() && isValidId(notificationId) && isValidNotification(incoming()) &&
+        incoming().authorId == existing().authorId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['title', 'message', 'type', 'targetSection', 'active']) &&
+        isAdmin();
+      allow delete: if isSignedIn() && isValidId(notificationId) && isAdmin();
+    }
+
+    match /analytics_daily/{dayId} {
+      allow get: if isSignedIn() && isValidId(dayId) && isAdmin();
+      allow list: if isBootstrappedAdmin();
+      allow create: if isSignedIn() && isValidId(dayId) && isValidDailyAnalytics(incoming()) &&
+        incoming().authorId == request.auth.uid &&
+        incoming().updatedAt == request.time &&
+        isAdmin();
+      allow update: if isSignedIn() && isValidId(dayId) && isValidDailyAnalytics(incoming()) &&
+        incoming().authorId == existing().authorId &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'dateLabel', 'isoDate', 'visitors', 'pageViews', 'searches',
+          'programViews', 'mobileShare', 'updatedAt'
+        ]) &&
+        isAdmin();
+      allow delete: if isSignedIn() && isValidId(dayId) && isAdmin();
+    }
+
+    match /analytics_events/{eventId} {
+      allow get: if isSignedIn() && isValidId(eventId) && (existing().actorId == request.auth.uid || isAdmin());
+      allow list: if isBootstrappedAdmin() || (isVerified() && resource.data.actorId == request.auth.uid);
+      allow create: if isVerified() && isValidId(eventId) && isValidAnalyticsEvent(incoming());
+      allow update: if false;
+      allow delete: if isSignedIn() && isValidId(eventId) && isAdmin();
+    }
+
+    match /admins/{adminId} {
+      allow get: if isSignedIn() && isValidId(adminId) && (request.auth.uid == adminId || isAdmin());
+      allow list: if isBootstrappedAdmin();
+      allow create: if isSignedIn() && isValidId(adminId) && isValidAdminUser(incoming()) &&
+        incoming().addedBy == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        isBootstrappedAdmin();
+      allow update: if isSignedIn() && isValidId(adminId) && isValidAdminUser(incoming()) &&
+        incoming().addedBy == existing().addedBy &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'role']) &&
+        isBootstrappedAdmin();
+      allow delete: if isSignedIn() && isValidId(adminId) && isBootstrappedAdmin();
+    }
+
+    match /gallery_photos/{photoId} {
+      allow get: if isValidId(photoId) && (existing().active == true || isAdmin());
+      allow list: if resource.data.active == true || isBootstrappedAdmin();
+      allow create: if isSignedIn() && isValidId(photoId) && isValidGalleryPhoto(incoming()) &&
+        incoming().authorId == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        isAdmin();
+      allow update: if isSignedIn() && isValidId(photoId) && isValidGalleryPhoto(incoming()) &&
+        incoming().authorId == existing().authorId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'title', 'caption', 'category', 'imageUrl', 'photographer',
+          'displayOrder', 'active', 'updatedAt'
+        ]) &&
+        isAdmin();
+      allow delete: if isSignedIn() && isValidId(photoId) && isAdmin();
+    }
+  }
+}

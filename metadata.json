@@ -1,0 +1,6 @@
+{
+  "name": "STAI Al-Furqan Makassar — University Portal & CMS",
+  "description": "Official university profile, academic program directory, interactive campus map, real-time campus notifications, and full-featured CMS & analytics dashboard for STAI Al-Furqan Makassar.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
