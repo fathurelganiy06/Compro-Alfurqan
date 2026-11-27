@@ -62,13 +62,13 @@ export const SocialMediaFooter: React.FC<SocialMediaFooterProps> = ({
     <div className="border-t border-[#EDF1EE] bg-[#FAFBF9]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="text-xs text-[#4A5D54]">
-          <span className="font-semibold text-[#0F1F18]">Official Channels</span>
+          <span className="font-semibold text-[#0F1F18]">Kanal Resmi</span>
           <span aria-hidden="true"> · </span>
-          <span>Follow {institutionName} across social platforms</span>
+          <span>Ikuti informasi terbaru {institutionName} di media sosial</span>
         </div>
 
         <nav
-          aria-label="Official University Social Media Profiles"
+          aria-label="Profil Media Sosial Resmi Kampus"
           className="flex flex-wrap items-center gap-2 sm:gap-3"
         >
           {activeProfiles.map(({ id, label, url, Icon }) => (
@@ -77,7 +77,7 @@ export const SocialMediaFooter: React.FC<SocialMediaFooterProps> = ({
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`${institutionName} on ${label}`}
+              aria-label={`${institutionName} di ${label}`}
               className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#0F1F18] bg-white border border-[#D4DDD6] hover:border-[#0E5A36] hover:text-[#0E5A36] rounded-lg transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0E5A36]"
             >
               <Icon className="w-3.5 h-3.5 text-[#0E5A36] shrink-0" />

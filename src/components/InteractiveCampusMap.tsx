@@ -21,7 +21,7 @@ import { useCampus } from '../context/CampusContext';
 
 const MAPS_API_KEY = (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined) || '';
 
-// Initial viewport center for Daya, Biringkanaya, Makassar
+// Titik awal wilayah Daya, Biringkanaya, Makassar
 const MAKASSAR_DAYA_DEFAULT = { lat: -5.1142, lng: 119.5122 };
 
 interface CampusFacility {
@@ -37,41 +37,41 @@ interface CampusFacility {
 const CAMPUS_FACILITIES: CampusFacility[] = [
   {
     id: 'rectorate',
-    name: 'Rectorate & Admissions Bureau (PMB)',
-    category: 'Administration',
-    hours: 'Mon–Fri · 08:00–16:00 WITA',
+    name: 'Gedung Rektorat & Biro PMB',
+    category: 'Administrasi',
+    hours: 'Sen–Jum · 08.00–16.00 WITA',
     description:
-      'Main administrative hub for admissions counseling, academic records, and university leadership offices.',
+      'Pusat layanan administrasi akademik, loket konsultasi Penerimaan Mahasiswa Baru, dan kantor pimpinan kampus.',
     offsetLat: 0,
     offsetLng: 0,
   },
   {
     id: 'mosque',
-    name: 'Al-Furqan Campus Mosque & Tahfidz Center',
-    category: 'Qur’anic Studies',
-    hours: 'Daily · 04:30–21:00 WITA',
+    name: 'Masjid Kampus Al-Furqan & Pusat Tahfidz',
+    category: 'Studi Al-Qur’an',
+    hours: 'Setiap Hari · 04.30–21.00 WITA',
     description:
-      'Center for congregational prayer, daily Tilawah halaqah, and student Tahfidzul Qur’an examinations.',
+      'Pusat ibadah berjamaah, halaqah Tilawah harian, serta pelaksanaan ujian sertifikasi Tahfidzul Qur’an mahasiswa.',
     offsetLat: 0.00055,
     offsetLng: 0.00045,
   },
   {
     id: 'library',
-    name: 'Central Library & Tarbiyah Lecture Wing',
-    category: 'Academic',
-    hours: 'Mon–Sat · 08:00–17:00 WITA',
+    name: 'Perpustakaan Pusat & Gedung Kuliah Tarbiyah',
+    category: 'Akademik',
+    hours: 'Sen–Sab · 08.00–17.00 WITA',
     description:
-      'Houses classical Islamic manuscripts, educational research journals, and undergraduate Tarbiyah classrooms.',
+      'Menghimpun koleksi kitab klasik Islam, jurnal riset pendidikan, serta ruang perkuliahan Fakultas Tarbiyah.',
     offsetLat: -0.00045,
     offsetLng: 0.00055,
   },
   {
     id: 'postgrad',
-    name: 'Postgraduate Hall & Main Auditorium',
+    name: 'Gedung Pascasarjana & Auditorium Utama',
     category: 'Pascasarjana',
-    hours: 'Mon–Sat · 08:00–18:00 WITA',
+    hours: 'Sen–Sab · 08.00–18.00 WITA',
     description:
-      'Dedicated S2 PAI seminar rooms, Syariah mediation lab, and the 500-seat institutional symposium hall.',
+      'Ruang seminar khusus Magister PAI (S2), laboratorium mediasi Syariah, serta auditorium simposium berkapasitas 500 kursi.',
     offsetLat: 0.00035,
     offsetLng: -0.0005,
   },
@@ -171,7 +171,7 @@ const PlaceSearchMarker: React.FC<PlaceMarkerProps> = ({
         <InfoWindow anchor={marker} maxWidth={260} onCloseClick={onClose}>
           <div className="p-1 text-[#0F1F18]">
             <div className="text-[11px] font-medium text-[#8A6914] mb-0.5">
-              Google Maps Place
+              Lokasi Google Maps
             </div>
             <div className="text-sm font-semibold leading-snug mb-1">
               {place.displayName}
@@ -188,7 +188,7 @@ const PlaceSearchMarker: React.FC<PlaceMarkerProps> = ({
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-xs font-medium text-[#0E5A36] hover:underline"
               >
-                Open in Google Maps
+                Buka di Google Maps
                 <ExternalLink className="w-3 h-3" />
               </a>
             )}
@@ -221,7 +221,6 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
   const [searchingPlaces, setSearchingPlaces] = useState(false);
   const [searchFeedback, setSearchFeedback] = useState<string | null>(null);
 
-  // Locate STAI Al-Furqan Makassar dynamically via Places API (New)
   useEffect(() => {
     if (!placesLib) return;
     let cancelled = false;
@@ -282,7 +281,7 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
         map.panTo(pos);
         map.setZoom(17);
       }
-      trackInteraction('map_interact', `Facility: ${facility.name}`);
+      trackInteraction('map_interact', `Fasilitas: ${facility.name}`);
     },
     [campusAnchor, map, trackInteraction],
   );
@@ -294,7 +293,7 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
       setSearchingPlaces(true);
       setSearchFeedback(null);
       setSelectedFacilityId(null);
-      trackInteraction('map_interact', `Places search: ${cleaned}`);
+      trackInteraction('map_interact', `Pencarian lokasi: ${cleaned}`);
 
       try {
         const { Place } = placesLib;
@@ -324,7 +323,7 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
           )
           .map((p, idx: number) => ({
             id: p.id || `place-${idx}`,
-            displayName: p.displayName || 'Unnamed Place',
+            displayName: p.displayName || 'Lokasi Tanpa Nama',
             formattedAddress: p.formattedAddress || '',
             location: {
               lat: p.location.lat(),
@@ -335,7 +334,7 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
 
         setNearbyResults(items);
         if (items.length === 0) {
-          setSearchFeedback('No places found near Daya Campus for that query.');
+          setSearchFeedback('Tidak ditemukan lokasi di sekitar Kampus Daya untuk pencarian tersebut.');
         } else {
           setSelectedPlaceId(items[0].id);
           if (map) {
@@ -351,9 +350,9 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
           msg.includes('429')
         ) {
           window.dispatchEvent(new CustomEvent('gmp-quota-exceeded'));
-          setSearchFeedback('Map search quota temporarily reached.');
+          setSearchFeedback('Kuota pencarian peta sementara telah tercapai.');
         } else {
-          setSearchFeedback('Unable to complete nearby place search right now.');
+          setSearchFeedback('Pencarian lokasi sekitar belum dapat diproses saat ini.');
         }
       } finally {
         setSearchingPlaces(false);
@@ -383,17 +382,16 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
       <div className="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-[#E2E8E2] p-5 sm:p-6 flex flex-col justify-between bg-[#FAFBF9]">
         <div>
           <div className="flex items-center justify-between gap-2 mb-4">
-            <h3 className="text-lg font-semibold text-[#0F1F18]">Campus Directory</h3>
+            <h3 className="text-lg font-semibold text-[#0F1F18]">Direktori Kampus</h3>
             <button
               type="button"
               onClick={handleResetToCampus}
               className="text-xs font-medium text-[#0E5A36] hover:underline whitespace-nowrap shrink-0 cursor-pointer"
             >
-              Center Campus
+              Pusatkan Peta
             </button>
           </div>
 
-          {/* Live Google Places (New) Search around Campus */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -402,7 +400,7 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
             className="mb-4"
           >
             <label htmlFor="campus-places-search" className="sr-only">
-              Search nearby Makassar landmarks or transit
+              Cari fasilitas umum atau transportasi terdekat di Makassar
             </label>
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
@@ -412,7 +410,7 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
                   type="text"
                   value={nearbyQuery}
                   onChange={(e) => setNearbyQuery(e.target.value)}
-                  placeholder="Find nearby transit, mosque, hotel..."
+                  placeholder="Cari terminal, masjid, penginapan terdekat..."
                   className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-[#D4DDD6] rounded-lg text-[#0F1F18] placeholder:text-[#76877E] focus:outline-none focus:border-[#0E5A36]"
                 />
               </div>
@@ -421,7 +419,7 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
                 disabled={searchingPlaces || !nearbyQuery.trim()}
                 className="px-3 py-2 text-xs font-medium text-white bg-[#0E5A36] hover:bg-[#093E25] disabled:opacity-50 rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
-                {searchingPlaces ? 'Finding...' : 'Search'}
+                {searchingPlaces ? 'Mencari...' : 'Cari'}
               </button>
             </div>
             <div className="flex items-center gap-2 mt-2 overflow-x-auto pb-1">
@@ -451,7 +449,7 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
             <div className="mb-5 pb-4 border-b border-[#E2E8E2]">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-[#8A6914]">
-                  Nearby Search Results ({nearbyResults.length})
+                  Hasil Lokasi Terdekat ({nearbyResults.length})
                 </span>
                 <button
                   type="button"
@@ -461,7 +459,7 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
                   }}
                   className="text-[11px] text-[#4A5D54] hover:text-[#0F1F18] cursor-pointer"
                 >
-                  Clear
+                  Bersihkan
                 </button>
               </div>
               <div className="space-y-1.5 max-h-44 overflow-y-auto">
@@ -539,11 +537,11 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
             href={directionsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => trackInteraction('map_interact', 'External Google Maps Directions')}
+            onClick={() => trackInteraction('map_interact', 'Petunjuk Arah Google Maps')}
             className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg transition-colors whitespace-nowrap"
           >
             <Navigation className="w-3.5 h-3.5" />
-            Get Directions in Google Maps
+            Petunjuk Arah di Google Maps
           </a>
         </div>
       </div>
@@ -562,7 +560,7 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
             }`}
           >
             <Compass className="w-3.5 h-3.5" />
-            Street Map
+            Peta Jalan
           </button>
           <button
             type="button"
@@ -574,7 +572,7 @@ const CampusMapWorkspace: React.FC<MapWorkspaceProps> = ({ address }) => {
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            Satellite
+            Satelit
           </button>
         </div>
 
@@ -630,7 +628,7 @@ export const InteractiveCampusMap: React.FC = () => {
       <div className="border border-[#E2E8E2] rounded-xl p-8 bg-white text-center">
         <MapPin className="w-8 h-8 text-[#0E5A36] mx-auto mb-3" />
         <h3 className="text-lg font-semibold text-[#0F1F18] mb-2">
-          Interactive Campus Map Configuration Pending
+          Konfigurasi Peta Kampus Interaktif Belum Aktif
         </h3>
         <p className="text-sm text-[#4A5D54] max-w-md mx-auto mb-4">
           {siteSettings.address}
@@ -641,7 +639,7 @@ export const InteractiveCampusMap: React.FC = () => {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#0E5A36] rounded-lg hover:bg-[#093E25]"
         >
-          Open Campus Location in Google Maps
+          Buka Lokasi Kampus di Google Maps
           <ExternalLink className="w-3.5 h-3.5" />
         </a>
       </div>
@@ -652,7 +650,7 @@ export const InteractiveCampusMap: React.FC = () => {
     <APIProvider
       apiKey={MAPS_API_KEY}
       libraries={['marker', 'places']}
-      language="en"
+      language="id"
       region="ID"
     >
       <CampusMapWorkspace address={siteSettings.address} />

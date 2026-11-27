@@ -39,24 +39,24 @@ function formatReadableDate(iso: string): string {
   if (parts.length !== 3) return iso;
   const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
   if (Number.isNaN(date.getTime())) return iso;
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function parseMonthDay(iso: string): { month: string; day: string } {
   const parts = iso.split('-');
-  if (parts.length !== 3) return { month: 'DATE', day: '--' };
+  if (parts.length !== 3) return { month: 'TGL', day: '--' };
   const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-  if (Number.isNaN(date.getTime())) return { month: 'DATE', day: '--' };
+  if (Number.isNaN(date.getTime())) return { month: 'TGL', day: '--' };
   return {
-    month: date.toLocaleDateString('en-US', { month: 'short' }),
+    month: date.toLocaleDateString('id-ID', { month: 'short' }),
     day: String(date.getDate()).padStart(2, '0'),
   };
 }
 
 function categoryLabel(cat: PostCategory): string {
-  if (cat === 'announcement') return 'Announcement';
-  if (cat === 'article') return 'Scholarly Article';
-  return 'Campus News';
+  if (cat === 'announcement') return 'Pengumuman';
+  if (cat === 'article') return 'Artikel Ilmiah';
+  return 'Berita Kampus';
 }
 
 export const UniversityPortal: React.FC<UniversityPortalProps> = ({
@@ -147,7 +147,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
   const handleInquirySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inquiryForm.fullName.trim() || !inquiryForm.email.includes('@')) return;
-    trackInteraction('program_view', `Admissions Inquiry: ${inquiryForm.programCode}`);
+    trackInteraction('program_view', `Permintaan Info PMB: ${inquiryForm.programCode}`);
     setInquirySubmitted(true);
   };
 
@@ -163,7 +163,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
           >
             <img
               src={UNIVERSITY_MEDIA.logo}
-              alt="STAI Al-Furqan Makassar Crest"
+              alt="Logo STAI Al-Furqan Makassar"
               className="w-9 h-9 rounded-full object-cover border border-[#E2E8E2] shrink-0"
             />
             <span className="font-editorial text-base sm:text-lg font-semibold tracking-tight text-[#0F1F18] whitespace-nowrap">
@@ -173,26 +173,26 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
 
           {/* Zone 2: 5 concise single-line text nav links */}
           <nav
-            aria-label="Primary Navigation"
+            aria-label="Navigasi Utama"
             className="hidden lg:flex items-center gap-7 text-sm font-medium text-[#4A5D54]"
           >
             <a
               href="#profile"
               className="hover:text-[#0E5A36] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
             >
-              Profile
+              Profil
             </a>
             <a
               href="#programs"
               className="hover:text-[#0E5A36] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
             >
-              Programs
+              Program Studi
             </a>
             <a
               href="#news"
               className="hover:text-[#0E5A36] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
             >
-              News &amp; Notices
+              Berita &amp; Info
             </a>
             <a
               href="#alumni"
@@ -204,7 +204,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
               href="#campus-map"
               className="hover:text-[#0E5A36] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
             >
-              Campus Map
+              Peta Kampus
             </a>
           </nav>
 
@@ -215,12 +215,12 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
               onClick={onOpenAdmin}
               className="px-4 py-2 text-xs sm:text-sm font-medium text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             >
-              {isAdmin ? 'CMS Dashboard' : 'Admin Portal'}
+              {isAdmin ? 'Dasbor CMS' : 'Portal Admin'}
             </button>
             <button
               type="button"
               onClick={() => setMobileMenuOpen((v) => !v)}
-              aria-label="Toggle navigation menu"
+              aria-label="Buka menu navigasi"
               className="lg:hidden p-2.5 text-[#0F1F18] hover:bg-[#F2F5F1] rounded-lg cursor-pointer"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -232,13 +232,13 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
         {mobileMenuOpen && (
           <div className="lg:hidden bg-white border-t border-[#E2E8E2] px-4 py-4 space-y-1">
             {[
-              ['#profile', 'Institutional Profile'],
-              ['#programs', 'Academic Programs'],
-              ['#news', 'News, Articles & Notices'],
-              ['#agenda', 'Campus Agenda'],
-              ['#gallery', 'Campus Life Gallery'],
-              ['#alumni', 'Alumni Testimonials'],
-              ['#campus-map', 'Interactive Campus Map'],
+              ['#profile', 'Profil Institusi'],
+              ['#programs', 'Program Studi'],
+              ['#news', 'Berita, Artikel & Pengumuman'],
+              ['#agenda', 'Agenda Kampus'],
+              ['#gallery', 'Galeri Kehidupan Kampus'],
+              ['#alumni', 'Testimoni Alumni'],
+              ['#campus-map', 'Peta Kampus Interaktif'],
             ].map(([href, label]) => (
               <a
                 key={href}
@@ -259,7 +259,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                 className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-medium text-[#0F1F18] border border-[#D4DDD6] rounded-lg cursor-pointer"
               >
                 <Search className="w-4 h-4 text-[#0E5A36]" />
-                Search Site
+                Cari Situs
               </button>
               <button
                 type="button"
@@ -270,7 +270,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                 className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-medium text-[#0F1F18] border border-[#D4DDD6] rounded-lg cursor-pointer"
               >
                 <Bell className="w-4 h-4 text-[#0E5A36]" />
-                Alerts ({unreadNotificationCount})
+                Info ({unreadNotificationCount})
               </button>
             </div>
           </div>
@@ -283,7 +283,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
           <div className="absolute inset-0">
             <ResilientImage
               src={UNIVERSITY_MEDIA.heroCourtyard}
-              alt="STAI Al-Furqan Makassar campus courtyard and mosque dome"
+              alt="Pelataran Kampus dan Kubah Masjid STAI Al-Furqan Makassar"
               className="w-full h-full object-cover object-center opacity-55"
               fallbackTitle="STAI Al-Furqan Makassar"
             />
@@ -294,8 +294,8 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
             <div className="max-w-3xl">
               <p className="text-xs sm:text-sm font-medium text-[#E5C158] tracking-wide mb-4">
                 {siteSettings.admissionsOpen
-                  ? `${siteSettings.admissionsLabel} · Makassar, South Sulawesi`
-                  : 'Sekolah Tinggi Agama Islam Al-Furqan · Makassar, South Sulawesi'}
+                  ? `${siteSettings.admissionsLabel} · Makassar, Sulawesi Selatan`
+                  : 'Sekolah Tinggi Agama Islam Al-Furqan · Makassar, Sulawesi Selatan'}
               </p>
 
               <h1 className="font-editorial text-3xl sm:text-5xl lg:text-[52px] font-semibold leading-[1.12] tracking-tight text-white mb-5">
@@ -312,7 +312,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                   href="#programs"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold text-[#082416] bg-[#E5C158] hover:bg-[#d7b245] rounded-lg transition-colors whitespace-nowrap shrink-0"
                 >
-                  Explore Academic Programs
+                  Jelajahi Program Studi
                   <ArrowRight className="w-4 h-4" />
                 </a>
                 <button
@@ -323,7 +323,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                   }}
                   className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium text-white border border-white/30 hover:bg-white/10 rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
-                  Admissions Information
+                  Informasi PMB
                 </button>
               </div>
 
@@ -338,14 +338,14 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                     type="text"
                     value={heroSearchInput}
                     onChange={(e) => setHeroSearchInput(e.target.value)}
-                    placeholder="Search study programs, articles, agenda, announcements..."
+                    placeholder="Cari program studi, artikel, agenda, pengumuman..."
                     className="flex-1 text-sm text-[#0F1F18] placeholder:text-[#6B7D74] bg-transparent focus:outline-none py-1.5"
                   />
                   <button
                     type="submit"
                     className="px-4 py-1.5 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   >
-                    Search
+                    Cari
                   </button>
                 </form>
 
@@ -355,7 +355,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                   className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-[#0E5A36]/90 hover:bg-[#0E5A36] border border-white/20 text-white text-xs font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   <Bell className="w-4 h-4 text-[#E5C158]" />
-                  <span>Campus Alerts</span>
+                  <span>Info Kampus</span>
                   {unreadNotificationCount > 0 && (
                     <span className="font-mono tabular-nums text-[#E5C158] font-semibold">
                       ({unreadNotificationCount})
@@ -368,43 +368,43 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
         </section>
 
         {/* Full-Width 4-Column Quantitative Proof Strip */}
-        <section aria-label="Institutional Highlights" className="bg-white border-b border-[#E2E8E2]">
+        <section aria-label="Keunggulan Institusi" className="bg-white border-b border-[#E2E8E2]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             <div>
               <div className="font-mono text-2xl sm:text-3xl font-semibold text-[#0E5A36] tabular-nums">
                 {programs.filter((p) => p.active).length}
               </div>
               <div className="text-sm font-medium text-[#0F1F18] mt-1">
-                Accredited Degree Programs
+                Program Studi Terakreditasi
               </div>
-              <div className="text-xs text-[#4A5D54] mt-0.5">S1 Undergraduate &amp; S2 Postgraduate</div>
+              <div className="text-xs text-[#4A5D54] mt-0.5">Sarjana (S1) &amp; Pascasarjana (S2)</div>
             </div>
             <div>
               <div className="font-mono text-2xl sm:text-3xl font-semibold text-[#0E5A36] tabular-nums">
-                30+ Years
+                30+ Tahun
               </div>
               <div className="text-sm font-medium text-[#0F1F18] mt-1">
-                Academic Heritage
+                Dedikasi Akademik
               </div>
-              <div className="text-xs text-[#4A5D54] mt-0.5">Serving Makassar &amp; Eastern Indonesia</div>
+              <div className="text-xs text-[#4A5D54] mt-0.5">Melayani Makassar &amp; Indonesia Timur</div>
             </div>
             <div>
               <div className="font-mono text-2xl sm:text-3xl font-semibold text-[#0E5A36] tabular-nums">
                 94%
               </div>
               <div className="text-sm font-medium text-[#0F1F18] mt-1">
-                Graduate Placement Rate
+                Tingkat Serapan Lulusan
               </div>
-              <div className="text-xs text-[#4A5D54] mt-0.5">Within 6 months of commencement</div>
+              <div className="text-xs text-[#4A5D54] mt-0.5">Dalam 6 bulan setelah wisuda</div>
             </div>
             <div>
               <div className="font-mono text-2xl sm:text-3xl font-semibold text-[#0E5A36] tabular-nums">
                 30 Juz
               </div>
               <div className="text-sm font-medium text-[#0F1F18] mt-1">
-                Tahfidz &amp; Tilawah Track
+                Program Tahfidz &amp; Tilawah
               </div>
-              <div className="text-xs text-[#4A5D54] mt-0.5">Integrated scholarship pathway</div>
+              <div className="text-xs text-[#4A5D54] mt-0.5">Jalur beasiswa terpadu</div>
             </div>
           </div>
         </section>
@@ -415,19 +415,19 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
             <div className="lg:col-span-5 rounded-xl overflow-hidden border border-[#E2E8E2] bg-white min-h-[300px]">
               <ResilientImage
                 src={UNIVERSITY_MEDIA.libraryHall}
-                alt="STAI Al-Furqan Makassar Academic Library and Study Hall"
+                alt="Perpustakaan Akademik dan Ruang Baca STAI Al-Furqan Makassar"
                 className="w-full h-full object-cover"
-                fallbackTitle="Academic Library & Scholarship Hall"
+                fallbackTitle="Perpustakaan Akademik & Ruang Baca"
               />
             </div>
 
             <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
               <div>
                 <p className="text-xs font-semibold text-[#0E5A36] mb-2">
-                  01. Institutional Profile
+                  01. Profil Institusi
                 </p>
                 <h2 className="font-editorial text-2xl sm:text-4xl font-semibold text-[#0F1F18] leading-tight mb-4">
-                  Grounded in Tafaqquh Fid-Din, Built for Contemporary Service
+                  Berlandaskan Tafaqquh Fid-Din, Siap Mengabdi di Era Kontemporer
                 </h2>
                 <p className="text-base text-[#4A5D54] leading-relaxed">
                   {siteSettings.rectorMessage}
@@ -442,13 +442,13 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-[#E2E8E2]">
                 <div>
                   <h3 className="text-base font-semibold text-[#0F1F18] mb-2">
-                    Institutional Vision
+                    Visi Institusi
                   </h3>
                   <p className="text-sm text-[#4A5D54] leading-relaxed">{siteSettings.vision}</p>
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-[#0F1F18] mb-2">
-                    Core Academic Mission
+                    Misi Akademik Utama
                   </h3>
                   <p className="text-sm text-[#4A5D54] leading-relaxed">{siteSettings.mission}</p>
                 </div>
@@ -466,24 +466,24 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
               <div className="max-w-2xl">
                 <p className="text-xs font-semibold text-[#0E5A36] mb-2">
-                  02. Academic Offerings
+                  02. Program Akademik
                 </p>
                 <h2 className="font-editorial text-2xl sm:text-4xl font-semibold text-[#0F1F18] leading-tight">
-                  Accredited Undergraduate &amp; Postgraduate Programs
+                  Program Studi Sarjana &amp; Pascasarjana Terakreditasi
                 </h2>
               </div>
 
               {/* Functional Segmented Filter Controls */}
               <div
                 role="tablist"
-                aria-label="Filter academic programs by degree level"
+                aria-label="Saring program studi berdasarkan jenjang"
                 className="inline-flex items-center gap-1 p-1 bg-white border border-[#D4DDD6] rounded-lg self-start md:self-auto"
               >
                 {(
                   [
-                    ['ALL', 'All Programs'],
-                    ['S2', 'Postgraduate (S2)'],
-                    ['S1', 'Undergraduate (S1)'],
+                    ['ALL', 'Semua Prodi'],
+                    ['S2', 'Pascasarjana (S2)'],
+                    ['S1', 'Sarjana (S1)'],
                   ] as const
                 ).map(([key, label]) => (
                   <button
@@ -506,7 +506,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
 
             {visiblePrograms.length === 0 ? (
               <div className="bg-white border border-[#E2E8E2] rounded-xl p-10 text-center">
-                <p className="text-sm text-[#4A5D54]">No active programs match the selected degree filter.</p>
+                <p className="text-sm text-[#4A5D54]">Belum ada program studi aktif pada jenjang yang dipilih.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -520,7 +520,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                         <span className="font-mono font-medium text-[#0E5A36]">
                           {program.code} · {program.degree}
                         </span>
-                        <span className="tabular-nums">Accreditation {program.accreditation}</span>
+                        <span className="tabular-nums">Akreditasi {program.accreditation}</span>
                       </div>
 
                       <h3 className="font-editorial text-xl font-semibold text-[#0F1F18] leading-snug mb-2">
@@ -549,7 +549,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                         onClick={() => handleOpenProgram(program)}
                         className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0E5A36] hover:underline whitespace-nowrap shrink-0 cursor-pointer"
                       >
-                        Program Details
+                        Detail Program
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -565,25 +565,25 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
             <div>
               <p className="text-xs font-semibold text-[#0E5A36] mb-2">
-                03. Campus Publications &amp; Calendar
+                03. Publikasi &amp; Kalender Kampus
               </p>
               <h2 className="font-editorial text-2xl sm:text-4xl font-semibold text-[#0F1F18] leading-tight">
-                News, Articles, Announcements &amp; Agenda
+                Berita, Artikel, Pengumuman &amp; Agenda
               </h2>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
               <div
                 role="tablist"
-                aria-label="Filter campus publications"
+                aria-label="Saring publikasi kampus"
                 className="inline-flex items-center gap-1 p-1 bg-[#F2F5F1] border border-[#E2E8E2] rounded-lg"
               >
                 {(
                   [
-                    ['all', 'All Updates'],
-                    ['news', 'News'],
-                    ['article', 'Articles'],
-                    ['announcement', 'Announcements'],
+                    ['all', 'Semua'],
+                    ['news', 'Berita'],
+                    ['article', 'Artikel'],
+                    ['announcement', 'Pengumuman'],
                   ] as const
                 ).map(([key, label]) => (
                   <button
@@ -609,7 +609,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                 className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#0F1F18] border border-[#D4DDD6] hover:bg-[#F2F5F1] rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer"
               >
                 <Search className="w-3.5 h-3.5 text-[#0E5A36]" />
-                Search Archive
+                Cari Arsip
               </button>
             </div>
           </div>
@@ -620,14 +620,14 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
               <div className="flex items-center justify-between gap-4 mb-3">
                 <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#0E5A36]">
                   <ShieldAlert className="w-4 h-4 text-[#C49A2C]" />
-                  Official Campus Bulletins
+                  Buletin Resmi Kampus
                 </div>
                 <button
                   type="button"
                   onClick={onOpenNotifications}
                   className="text-xs font-medium text-[#0E5A36] hover:underline whitespace-nowrap shrink-0 cursor-pointer"
                 >
-                  View All Alerts
+                  Lihat Semua Info
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 divide-y md:divide-y-0 md:divide-x divide-[#EDF1EE]">
@@ -635,7 +635,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                   <div key={notice.id} className={idx > 0 ? 'pt-3 md:pt-0 md:pl-5' : ''}>
                     <div className="text-xs text-[#4A5D54] mb-1">
                       <span className={notice.priority === 'urgent' ? 'font-semibold text-red-700' : 'font-semibold text-amber-800'}>
-                        {notice.priority === 'urgent' ? 'Urgent Notice' : 'Important Notice'}
+                        {notice.priority === 'urgent' ? 'Pengumuman Mendesak' : 'Pengumuman Penting'}
                       </span>
                       <span aria-hidden="true"> · </span>
                       <span className="font-mono tabular-nums">{formatReadableDate(notice.publishedDate)}</span>
@@ -660,7 +660,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
             <div className="lg:col-span-8">
               {filteredPosts.length === 0 ? (
                 <div className="bg-white border border-[#E2E8E2] rounded-xl p-10 text-center">
-                  <p className="text-sm text-[#4A5D54]">No published posts in this category yet.</p>
+                  <p className="text-sm text-[#4A5D54]">Belum ada publikasi yang diterbitkan pada kategori ini.</p>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -697,14 +697,14 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                           </div>
                           <div className="pt-4 border-t border-[#EDF1EE] flex items-center justify-between gap-2">
                             <span className="text-xs text-[#6B7D74] truncate">
-                              {lead.authorName} · <span className="tabular-nums">{lead.views}</span> views
+                              {lead.authorName} · <span className="tabular-nums">{lead.views}</span> kali dibaca
                             </span>
                             <button
                               type="button"
                               onClick={() => handleOpenPost(lead)}
                               className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0E5A36] hover:underline whitespace-nowrap shrink-0 cursor-pointer"
                             >
-                              Read Full Story
+                              Baca Selengkapnya
                               <ArrowRight className="w-3.5 h-3.5" />
                             </button>
                           </div>
@@ -757,7 +757,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                               onClick={() => handleOpenPost(post)}
                               className="text-xs font-semibold text-[#0E5A36] hover:underline whitespace-nowrap shrink-0 cursor-pointer"
                             >
-                              Read Article
+                              Baca Artikel
                             </button>
                           </div>
                         </article>
@@ -774,10 +774,10 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                 <div className="flex items-center justify-between gap-2 pb-4 border-b border-[#E2E8E2] mb-4">
                   <div>
                     <h3 className="font-editorial text-xl font-semibold text-[#0F1F18]">
-                      Campus Agenda
+                      Agenda Kampus
                     </h3>
                     <p className="text-xs text-[#4A5D54] mt-0.5">
-                      Upcoming academic &amp; student events
+                      Jadwal kegiatan akademik &amp; kemahasiswaan
                     </p>
                   </div>
                   <Calendar className="w-5 h-5 text-[#0E5A36] shrink-0" />
@@ -785,7 +785,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
 
                 {visibleAgenda.length === 0 ? (
                   <p className="text-sm text-[#4A5D54] py-6 text-center">
-                    No scheduled events available.
+                    Belum ada jadwal kegiatan mendatang.
                   </p>
                 ) : (
                   <div className="divide-y divide-[#EDF1EE]">
@@ -846,14 +846,14 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mb-12">
               <p className="text-xs font-semibold text-[#E5C158] mb-2">
-                05. Alumni Outcomes
+                05. Jejak &amp; Testimoni Alumni
               </p>
               <h2 className="font-editorial text-2xl sm:text-4xl font-semibold text-white leading-tight mb-3">
-                Graduates Serving Schools, Courts &amp; Communities
+                Lulusan Mengabdi di Pendidikan, Peradilan &amp; Masyarakat
               </h2>
               <p className="text-sm sm:text-base text-white/80 leading-relaxed">
-                Verified perspectives from STAI Al-Furqan Makassar alumni advancing Islamic
-                education, family mediation, and community guidance across South Sulawesi.
+                Kisah nyata para alumni STAI Al-Furqan Makassar yang berkiprah dalam pendidikan
+                Islam, mediasi hukum keluarga, dan dakwah kemasyarakatan di Sulawesi Selatan.
               </p>
             </div>
 
@@ -876,7 +876,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                     <div className="text-right shrink-0">
                       <div className="text-xs font-medium text-[#E5C158]">{item.program}</div>
                       <div className="text-xs font-mono text-white/65 tabular-nums">
-                        Class of {item.graduationYear}
+                        Angkatan {item.graduationYear}
                       </div>
                     </div>
                   </figcaption>
@@ -890,14 +890,14 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
         <section id="campus-map" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <div className="max-w-2xl mb-8">
             <p className="text-xs font-semibold text-[#0E5A36] mb-2">
-              06. Visit Daya Campus
+              06. Kunjungi Kampus Daya
             </p>
             <h2 className="font-editorial text-2xl sm:text-4xl font-semibold text-[#0F1F18] leading-tight mb-3">
-              Interactive Campus Map &amp; Makassar Access
+              Peta Kampus Interaktif &amp; Akses Makassar
             </h2>
             <p className="text-sm sm:text-base text-[#4A5D54] leading-relaxed">
-              Explore campus buildings along Jl. Perintis Kemerdekaan KM. 15, Daya, Makassar, or
-              search nearby transit hubs and landmarks using live Google Maps data.
+              Jelajahi fasilitas gedung kampus di Jl. Perintis Kemerdekaan KM. 15, Daya, Makassar,
+              atau cari akses transportasi dan lokasi penting sekitar melalui data Google Maps.
             </p>
           </div>
 
@@ -912,7 +912,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
             <div className="flex items-center gap-3 mb-3">
               <img
                 src={UNIVERSITY_MEDIA.logo}
-                alt="STAI Al-Furqan Makassar Crest"
+                alt="Logo STAI Al-Furqan Makassar"
                 className="w-9 h-9 rounded-full object-cover border border-[#E2E8E2]"
               />
               <span className="font-editorial text-lg font-semibold text-[#0F1F18]">
@@ -935,59 +935,59 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
           </div>
 
           <div className="md:col-span-3">
-            <h4 className="text-xs font-semibold text-[#0F1F18] mb-3">Quick Navigation</h4>
+            <h4 className="text-xs font-semibold text-[#0F1F18] mb-3">Navigasi Cepat</h4>
             <ul className="space-y-2 text-sm text-[#4A5D54]">
-              <li><a href="#profile" className="hover:text-[#0E5A36]">Institutional Profile</a></li>
-              <li><a href="#programs" className="hover:text-[#0E5A36]">Academic Programs</a></li>
-              <li><a href="#news" className="hover:text-[#0E5A36]">News &amp; Announcements</a></li>
-              <li><a href="#gallery" className="hover:text-[#0E5A36]">Campus Life Gallery</a></li>
-              <li><a href="#alumni" className="hover:text-[#0E5A36]">Alumni Testimonials</a></li>
+              <li><a href="#profile" className="hover:text-[#0E5A36]">Profil Institusi</a></li>
+              <li><a href="#programs" className="hover:text-[#0E5A36]">Program Studi</a></li>
+              <li><a href="#news" className="hover:text-[#0E5A36]">Berita &amp; Pengumuman</a></li>
+              <li><a href="#gallery" className="hover:text-[#0E5A36]">Galeri Kehidupan Kampus</a></li>
+              <li><a href="#alumni" className="hover:text-[#0E5A36]">Testimoni Alumni</a></li>
             </ul>
           </div>
 
           <div className="md:col-span-4">
-            <h4 className="text-xs font-semibold text-[#0F1F18] mb-3">Portal Services</h4>
+            <h4 className="text-xs font-semibold text-[#0F1F18] mb-3">Layanan Portal</h4>
             <div className="space-y-2.5 text-sm text-[#4A5D54]">
               <button
                 type="button"
                 onClick={() => onOpenSearch('')}
                 className="block hover:text-[#0E5A36] cursor-pointer"
               >
-                Integrated Site Search
+                Pencarian Situs Terpadu
               </button>
               <button
                 type="button"
                 onClick={onOpenNotifications}
                 className="block hover:text-[#0E5A36] cursor-pointer"
               >
-                Real-Time Campus Notifications
+                Notifikasi Kampus Real-Time
               </button>
               <button
                 type="button"
                 onClick={onOpenAdmin}
                 className="block hover:text-[#0E5A36] cursor-pointer"
               >
-                Administrative CMS &amp; Analytics
+                Dasbor CMS &amp; Analitik
               </button>
             </div>
             <p className="text-[11px] text-[#6B7D74] mt-5 leading-relaxed">
-              Interactive campus mapping uses Google Maps Platform features and is subject to the{' '}
+              Peta kampus interaktif menggunakan layanan Google Maps Platform dan tunduk pada{' '}
               <a
                 href="https://maps.google.com/help/terms_maps/?utm_campaign=gmp_mcp_codeassist_v1_aistudio"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:text-[#0E5A36]"
               >
-                Google Maps End User Terms
+                Ketentuan Pengguna Akhir Google Maps
               </a>{' '}
-              and{' '}
+              dan{' '}
               <a
                 href="https://policies.google.com/privacy?utm_campaign=gmp_mcp_codeassist_v1_aistudio"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:text-[#0E5A36]"
               >
-                Google Privacy Policy
+                Kebijakan Privasi Google
               </a>
               .
             </p>
@@ -1004,8 +1004,8 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
         />
         <div className="border-t border-[#EDF1EE]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#6B7D74]">
-            <span>© {new Date().getFullYear()} {siteSettings.institutionName}. All rights reserved.</span>
-            <span>Daya Campus · Makassar, South Sulawesi, Indonesia</span>
+            <span>© {new Date().getFullYear()} {siteSettings.institutionName}. Seluruh hak cipta dilindungi.</span>
+            <span>Kampus Daya · Makassar, Sulawesi Selatan, Indonesia</span>
           </div>
         </div>
       </footer>
@@ -1027,7 +1027,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
             <div className="px-6 py-5 border-b border-[#E2E8E2] flex items-start justify-between gap-4">
               <div>
                 <div className="text-xs font-mono text-[#0E5A36] mb-1">
-                  {selectedProgram.code} · {selectedProgram.degree} · Accreditation{' '}
+                  {selectedProgram.code} · {selectedProgram.degree} · Akreditasi{' '}
                   {selectedProgram.accreditation}
                 </div>
                 <h3 className="font-editorial text-2xl font-semibold text-[#0F1F18]">
@@ -1037,7 +1037,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
               <button
                 type="button"
                 onClick={() => onSelectProgram(null)}
-                aria-label="Close program details"
+                aria-label="Tutup detail program studi"
                 className="p-1.5 text-[#4A5D54] hover:text-[#0F1F18] hover:bg-[#F2F5F1] rounded-lg cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -1046,19 +1046,19 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
             <div className="p-6 overflow-y-auto space-y-5">
               <div className="grid grid-cols-3 gap-4 p-4 bg-[#FAFBF9] border border-[#E2E8E2] rounded-lg text-xs">
                 <div>
-                  <div className="text-[#6B7D74]">Faculty</div>
+                  <div className="text-[#6B7D74]">Fakultas</div>
                   <div className="font-semibold text-[#0F1F18] mt-0.5">
                     {selectedProgram.faculty}
                   </div>
                 </div>
                 <div>
-                  <div className="text-[#6B7D74]">Duration</div>
+                  <div className="text-[#6B7D74]">Masa Studi</div>
                   <div className="font-semibold text-[#0F1F18] mt-0.5">
                     {selectedProgram.duration}
                   </div>
                 </div>
                 <div>
-                  <div className="text-[#6B7D74]">Total Credits</div>
+                  <div className="text-[#6B7D74]">Total Beban Studi</div>
                   <div className="font-mono font-semibold text-[#0F1F18] tabular-nums mt-0.5">
                     {selectedProgram.credits} SKS
                   </div>
@@ -1066,13 +1066,13 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
               </div>
 
               <div>
-                <h4 className="text-xs font-semibold text-[#0F1F18] mb-1.5">Academic Overview</h4>
+                <h4 className="text-xs font-semibold text-[#0F1F18] mb-1.5">Gambaran Akademik</h4>
                 <p className="text-sm text-[#4A5D54] leading-relaxed">{selectedProgram.summary}</p>
               </div>
 
               <div>
                 <h4 className="text-xs font-semibold text-[#0F1F18] mb-1.5">
-                  Graduate Career Pathways
+                  Prospek Karier Lulusan
                 </h4>
                 <p className="text-sm text-[#4A5D54] leading-relaxed">
                   {selectedProgram.careerOutcomes}
@@ -1085,7 +1085,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                 onClick={() => onSelectProgram(null)}
                 className="px-4 py-2 text-xs font-medium text-[#4A5D54] hover:text-[#0F1F18] cursor-pointer"
               >
-                Close
+                Tutup
               </button>
               <button
                 type="button"
@@ -1097,7 +1097,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                 }}
                 className="px-4 py-2 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg cursor-pointer"
               >
-                Request Admissions Guide
+                Minta Panduan PMB
               </button>
             </div>
           </div>
@@ -1128,7 +1128,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
               <button
                 type="button"
                 onClick={() => onSelectPost(null)}
-                aria-label="Close article"
+                aria-label="Tutup artikel"
                 className="absolute top-4 right-4 p-2 bg-white/95 text-[#0F1F18] rounded-lg shadow-sm hover:bg-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -1144,7 +1144,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                 <span aria-hidden="true"> · </span>
                 <span>{selectedPost.authorName}</span>
                 <span aria-hidden="true"> · </span>
-                <span className="tabular-nums">{selectedPost.views} views</span>
+                <span className="tabular-nums">{selectedPost.views} kali dibaca</span>
               </div>
               <h2 className="font-editorial text-2xl sm:text-3xl font-semibold text-[#0F1F18] leading-snug mb-5">
                 {selectedPost.title}
@@ -1176,7 +1176,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
             <div className="flex items-start justify-between gap-4 mb-4">
               <div>
                 <div className="text-xs font-semibold text-[#0E5A36] mb-1">
-                  Campus Agenda · {selectedAgenda.organizer}
+                  Agenda Kampus · {selectedAgenda.organizer}
                 </div>
                 <h3 className="font-editorial text-xl font-semibold text-[#0F1F18]">
                   {selectedAgenda.title}
@@ -1185,7 +1185,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
               <button
                 type="button"
                 onClick={() => onSelectAgenda(null)}
-                aria-label="Close event details"
+                aria-label="Tutup detail agenda"
                 className="p-1.5 text-[#4A5D54] hover:text-[#0F1F18] hover:bg-[#F2F5F1] rounded-lg cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -1213,7 +1213,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                 onClick={() => onSelectAgenda(null)}
                 className="px-4 py-2 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg cursor-pointer"
               >
-                Done
+                Selesai
               </button>
             </div>
           </div>
@@ -1226,7 +1226,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           role="dialog"
           aria-modal="true"
-          aria-label="Admissions Inquiry"
+          aria-label="Formulir Konsultasi PMB"
         >
           <div
             className="fixed inset-0 bg-[#0F1F18]/45 backdrop-blur-[1px]"
@@ -1237,14 +1237,14 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
             <div className="flex items-start justify-between gap-4 mb-4">
               <div>
                 <h3 className="font-editorial text-xl font-semibold text-[#0F1F18]">
-                  Admissions &amp; Scholarship Desk
+                  Layanan Informasi PMB &amp; Beasiswa
                 </h3>
                 <p className="text-xs text-[#4A5D54] mt-0.5">{siteSettings.admissionsLabel}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setAdmissionsInquiryOpen(false)}
-                aria-label="Close admissions dialog"
+                aria-label="Tutup dialog PMB"
                 className="p-1.5 text-[#4A5D54] hover:text-[#0F1F18] hover:bg-[#F2F5F1] rounded-lg cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -1255,11 +1255,12 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
               <div className="py-4">
                 <div className="inline-flex items-center gap-2 text-sm font-semibold text-[#0E5A36] mb-2">
                   <GraduationCap className="w-5 h-5" />
-                  Inquiry Recorded
+                  Permintaan Tercatat
                 </div>
                 <p className="text-sm text-[#4A5D54] leading-relaxed mb-5">
-                  Thank you, {inquiryForm.fullName}. Our Admissions Bureau (PMB) at Daya Campus
-                  will follow up with program brochures and Tahfidz scholarship details for{' '}
+                  Terima kasih, {inquiryForm.fullName}. Biro Penerimaan Mahasiswa Baru (PMB) di
+                  Kampus Daya akan segera mengirimkan brosur program studi dan informasi Beasiswa
+                  Tahfidz untuk{' '}
                   <span className="font-medium text-[#0F1F18]">{inquiryForm.programCode}</span>.
                 </p>
                 <button
@@ -1267,40 +1268,40 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                   onClick={() => setAdmissionsInquiryOpen(false)}
                   className="w-full py-2.5 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg cursor-pointer"
                 >
-                  Return to Portal
+                  Kembali ke Portal
                 </button>
               </div>
             ) : (
               <form onSubmit={handleInquirySubmit} className="space-y-4">
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    Full Name
+                    Nama Lengkap
                   </label>
                   <input
                     type="text"
                     required
                     value={inquiryForm.fullName}
                     onChange={(e) => setInquiryForm({ ...inquiryForm, fullName: e.target.value })}
-                    placeholder="e.g. Muhammad Fathur"
+                    placeholder="Contoh: Muhammad Fathur"
                     className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg focus:outline-none focus:border-[#0E5A36]"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    Email Address
+                    Alamat Email
                   </label>
                   <input
                     type="email"
                     required
                     value={inquiryForm.email}
                     onChange={(e) => setInquiryForm({ ...inquiryForm, email: e.target.value })}
-                    placeholder="name@example.com"
+                    placeholder="nama@contoh.com"
                     className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg focus:outline-none focus:border-[#0E5A36]"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    WhatsApp / Phone Number
+                    Nomor WhatsApp / Telepon
                   </label>
                   <input
                     type="tel"
@@ -1313,7 +1314,7 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    Preferred Program
+                    Program Studi Pilihan
                   </label>
                   <select
                     value={inquiryForm.programCode}
@@ -1333,14 +1334,14 @@ export const UniversityPortal: React.FC<UniversityPortalProps> = ({
                     onClick={() => setAdmissionsInquiryOpen(false)}
                     className="px-4 py-2 text-xs font-medium text-[#4A5D54] hover:text-[#0F1F18] cursor-pointer"
                   >
-                    Cancel
+                    Batal
                   </button>
                   <button
                     type="submit"
                     className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg cursor-pointer"
                   >
                     <BookOpen className="w-3.5 h-3.5" />
-                    Submit Request
+                    Kirim Permintaan
                   </button>
                 </div>
               </form>

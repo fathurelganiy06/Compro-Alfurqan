@@ -10,25 +10,25 @@ interface NotificationCenterProps {
 }
 
 function formatRelativeTime(ms?: number): string {
-  if (!ms) return 'Just now';
+  if (!ms) return 'Baru saja';
   const diffMin = Math.max(1, Math.floor((Date.now() - ms) / 60000));
-  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffMin < 60) return `${diffMin} mnt lalu`;
   const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
+  if (diffHr < 24) return `${diffHr} jam lalu`;
   const diffDays = Math.floor(diffHr / 24);
-  return `${diffDays}d ago`;
+  return `${diffDays} hari lalu`;
 }
 
 function getNotificationMeta(type: CampusNotification['type']) {
   switch (type) {
     case 'urgent':
-      return { label: 'Urgent Notice', Icon: ShieldAlert, accent: 'text-red-700' };
+      return { label: 'Info Penting', Icon: ShieldAlert, accent: 'text-red-700' };
     case 'agenda':
-      return { label: 'Campus Agenda', Icon: Calendar, accent: 'text-amber-700' };
+      return { label: 'Agenda Kampus', Icon: Calendar, accent: 'text-amber-700' };
     case 'news':
-      return { label: 'Campus News', Icon: Newspaper, accent: 'text-[#0E5A36]' };
+      return { label: 'Berita Kampus', Icon: Newspaper, accent: 'text-[#0E5A36]' };
     default:
-      return { label: 'Announcement', Icon: Megaphone, accent: 'text-[#0E5A36]' };
+      return { label: 'Pengumuman', Icon: Megaphone, accent: 'text-[#0E5A36]' };
   }
 }
 
@@ -43,7 +43,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Campus Notifications">
+    <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Notifikasi Kampus">
       <div
         className="fixed inset-0 bg-[#0F1F18]/30 backdrop-blur-[1px]"
         onClick={onClose}
@@ -52,15 +52,15 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
       <aside className="relative z-10 w-full max-w-md bg-white h-full border-l border-[#E2E8E2] flex flex-col shadow-xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8E2]">
           <div>
-            <h2 className="text-lg font-semibold text-[#0F1F18]">Campus Notifications</h2>
+            <h2 className="text-lg font-semibold text-[#0F1F18]">Notifikasi Kampus</h2>
             <p className="text-xs text-[#4A5D54] mt-0.5">
-              Real-time announcements synchronized from the CMS
+              Pengumuman langsung yang tersinkronisasi dari CMS
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close notifications"
+            aria-label="Tutup notifikasi"
             className="p-2 text-[#4A5D54] hover:text-[#0F1F18] hover:bg-[#F2F5F1] rounded-lg transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -70,7 +70,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         {unreadNotificationCount > 0 && (
           <div className="px-6 py-2.5 bg-[#FAFBF9] border-b border-[#E2E8E2] flex items-center justify-between">
             <span className="text-xs font-medium text-[#0F1F18] tabular-nums">
-              {unreadNotificationCount} unread update{unreadNotificationCount === 1 ? '' : 's'}
+              {unreadNotificationCount} pembaruan belum dibaca
             </span>
             <button
               type="button"
@@ -78,7 +78,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
               className="inline-flex items-center gap-1.5 text-xs font-medium text-[#0E5A36] hover:underline cursor-pointer"
             >
               <CheckCheck className="w-3.5 h-3.5" />
-              Mark all read
+              Tandai semua dibaca
             </button>
           </div>
         )}
@@ -87,9 +87,9 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
           {activeNotifications.length === 0 ? (
             <div className="p-10 text-center">
               <Bell className="w-8 h-8 text-[#9BA9A1] mx-auto mb-3" />
-              <p className="text-sm font-medium text-[#0F1F18]">No active notifications</p>
+              <p className="text-sm font-medium text-[#0F1F18]">Belum ada notifikasi aktif</p>
               <p className="text-xs text-[#4A5D54] mt-1">
-                New campus announcements and agenda updates will appear here immediately.
+                Pengumuman kampus dan pembaruan agenda terbaru akan tampil otomatis di sini.
               </p>
             </div>
           ) : (
@@ -149,7 +149,7 @@ export const LiveNotificationToast: React.FC<{
         <div className="min-w-0">
           <div className={`inline-flex items-center gap-1.5 text-xs font-semibold ${accent} mb-1`}>
             <Icon className="w-3.5 h-3.5" />
-            New {label}
+            {label} Baru
           </div>
           <div className="text-sm font-semibold text-[#0F1F18] leading-snug">
             {latestLiveNotification.title}
@@ -165,13 +165,13 @@ export const LiveNotificationToast: React.FC<{
             }}
             className="mt-2.5 text-xs font-semibold text-[#0E5A36] hover:underline cursor-pointer"
           >
-            View in Notification Center
+            Lihat di Pusat Notifikasi
           </button>
         </div>
         <button
           type="button"
           onClick={dismissLiveToast}
-          aria-label="Dismiss notification"
+          aria-label="Tutup pemberitahuan"
           className="p-1 text-[#6B7D74] hover:text-[#0F1F18] rounded cursor-pointer"
         >
           <X className="w-4 h-4" />

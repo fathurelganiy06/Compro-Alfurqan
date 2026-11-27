@@ -153,9 +153,9 @@ interface CampusContextValue {
 
 const CampusContext = createContext<CampusContextValue | null>(null);
 
-const READ_NOTIFS_KEY = 'stai_alfurqan_read_notifs_v1';
-const SESSION_TELEMETRY_KEY = 'stai_alfurqan_session_telemetry_v1';
-const DEMO_CMS_STORAGE_KEY = 'stai_alfurqan_demo_cms_v1';
+const READ_NOTIFS_KEY = 'stai_alfurqan_read_notifs_v2';
+const SESSION_TELEMETRY_KEY = 'stai_alfurqan_session_telemetry_v2';
+const DEMO_CMS_STORAGE_KEY = 'stai_alfurqan_demo_cms_id_v2';
 const DEMO_ACTOR_ID = 'demo-admin';
 
 function extractMillis(ts: unknown, fallback = 0): number {
@@ -267,37 +267,37 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, []);
 
-  // Derived active state: live Firestore when signed in as verified cloud admin, or demo store over cloud defaults
+  // Derived active state: live Firestore when signed in as verified cloud admin, or Indonesian defaults + demo edits
   const siteSettings = useMemo(
-    () => (isCloudAdmin ? cloudSiteSettings : demoStore.siteSettings ?? cloudSiteSettings),
+    () => (isCloudAdmin ? cloudSiteSettings : demoStore.siteSettings ?? DEFAULT_SITE_SETTINGS),
     [isCloudAdmin, cloudSiteSettings, demoStore.siteSettings],
   );
   const programs = useMemo(
-    () => (isCloudAdmin ? cloudPrograms : demoStore.programs ?? cloudPrograms),
+    () => (isCloudAdmin ? cloudPrograms : demoStore.programs ?? DEFAULT_PROGRAMS),
     [isCloudAdmin, cloudPrograms, demoStore.programs],
   );
   const posts = useMemo(
-    () => (isCloudAdmin ? cloudPosts : demoStore.posts ?? cloudPosts),
+    () => (isCloudAdmin ? cloudPosts : demoStore.posts ?? DEFAULT_POSTS),
     [isCloudAdmin, cloudPosts, demoStore.posts],
   );
   const agenda = useMemo(
-    () => (isCloudAdmin ? cloudAgenda : demoStore.agenda ?? cloudAgenda),
+    () => (isCloudAdmin ? cloudAgenda : demoStore.agenda ?? DEFAULT_AGENDA),
     [isCloudAdmin, cloudAgenda, demoStore.agenda],
   );
   const testimonials = useMemo(
-    () => (isCloudAdmin ? cloudTestimonials : demoStore.testimonials ?? cloudTestimonials),
+    () => (isCloudAdmin ? cloudTestimonials : demoStore.testimonials ?? DEFAULT_TESTIMONIALS),
     [isCloudAdmin, cloudTestimonials, demoStore.testimonials],
   );
   const galleryPhotos = useMemo(
-    () => (isCloudAdmin ? cloudGalleryPhotos : demoStore.galleryPhotos ?? cloudGalleryPhotos),
+    () => (isCloudAdmin ? cloudGalleryPhotos : demoStore.galleryPhotos ?? DEFAULT_GALLERY_PHOTOS),
     [isCloudAdmin, cloudGalleryPhotos, demoStore.galleryPhotos],
   );
   const notifications = useMemo(
-    () => (isCloudAdmin ? cloudNotifications : demoStore.notifications ?? cloudNotifications),
+    () => (isCloudAdmin ? cloudNotifications : demoStore.notifications ?? DEFAULT_NOTIFICATIONS),
     [isCloudAdmin, cloudNotifications, demoStore.notifications],
   );
   const dailyAnalytics = useMemo(
-    () => (isCloudAdmin ? cloudDailyAnalytics : demoStore.dailyAnalytics ?? cloudDailyAnalytics),
+    () => (isCloudAdmin ? cloudDailyAnalytics : demoStore.dailyAnalytics ?? DEFAULT_DAILY_ANALYTICS),
     [isCloudAdmin, cloudDailyAnalytics, demoStore.dailyAnalytics],
   );
 
@@ -569,10 +569,10 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       const cred = await signInWithPopup(auth, googleProvider);
       if (!cred.user.emailVerified) {
-        setAuthError('Your Google account email must be verified to sync with Firestore.');
+        setAuthError('Email akun Google Anda harus terverifikasi untuk sinkronisasi Firestore.');
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unable to complete Google sign-in.';
+      const msg = err instanceof Error ? err.message : 'Gagal menyelesaikan proses masuk dengan Google.';
       if (!msg.includes('popup-closed-by-user')) {
         setAuthError(msg);
       }
@@ -757,7 +757,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       if (!user || !isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.programs ?? cloudPrograms;
+          const list = prev.programs ?? DEFAULT_PROGRAMS;
           const nextItem: AcademicProgram = {
             id,
             ...sanitized,
@@ -798,7 +798,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     async (id: string) => {
       if (!user || !isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.programs ?? cloudPrograms;
+          const list = prev.programs ?? DEFAULT_PROGRAMS;
           return { ...prev, programs: list.filter((p) => p.id !== id) };
         });
         return;
@@ -838,7 +838,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           createdAtMs: nowMs,
         };
         updateDemoStore((prev) => {
-          const list = prev.notifications ?? cloudNotifications;
+          const list = prev.notifications ?? DEFAULT_NOTIFICATIONS;
           return { ...prev, notifications: [newNotif, ...list] };
         });
         knownNotifIdsRef.current.add(id);
@@ -883,7 +883,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       if (!user || !isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.posts ?? cloudPosts;
+          const list = prev.posts ?? DEFAULT_POSTS;
           const nextItem: Post = {
             id,
             ...sanitized,
@@ -950,7 +950,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     async (id: string) => {
       if (!user || !isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.posts ?? cloudPosts;
+          const list = prev.posts ?? DEFAULT_POSTS;
           return { ...prev, posts: list.filter((p) => p.id !== id) };
         });
         return;
@@ -985,7 +985,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       if (!user || !isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.agenda ?? cloudAgenda;
+          const list = prev.agenda ?? DEFAULT_AGENDA;
           const nextItem: AgendaEvent = {
             id,
             ...sanitized,
@@ -1001,7 +1001,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         if (alsoNotify && data.active) {
           await broadcastNotification({
             title: `Agenda: ${sanitized.title}`.slice(0, BLUEPRINT_BOUNDS.notification.titleMax),
-            message: `${sanitized.eventDate} · ${sanitized.timeRange} at ${sanitized.location}`.slice(
+            message: `${sanitized.eventDate} · ${sanitized.timeRange} di ${sanitized.location}`.slice(
               0,
               BLUEPRINT_BOUNDS.notification.messageMax,
             ),
@@ -1029,7 +1029,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         if (alsoNotify && data.active) {
           await broadcastNotification({
             title: `Agenda: ${baseFields.title}`.slice(0, BLUEPRINT_BOUNDS.notification.titleMax),
-            message: `${baseFields.eventDate} · ${baseFields.timeRange} at ${baseFields.location}`.slice(
+            message: `${baseFields.eventDate} · ${baseFields.timeRange} di ${baseFields.location}`.slice(
               0,
               BLUEPRINT_BOUNDS.notification.messageMax,
             ),
@@ -1048,7 +1048,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     async (id: string) => {
       if (!user || !isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.agenda ?? cloudAgenda;
+          const list = prev.agenda ?? DEFAULT_AGENDA;
           return { ...prev, agenda: list.filter((e) => e.id !== id) };
         });
         return;
@@ -1085,7 +1085,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       if (!user || !isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.testimonials ?? cloudTestimonials;
+          const list = prev.testimonials ?? DEFAULT_TESTIMONIALS;
           const nextItem: AlumniTestimonial = {
             id,
             ...sanitized,
@@ -1130,7 +1130,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     async (id: string) => {
       if (!user || !isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.testimonials ?? cloudTestimonials;
+          const list = prev.testimonials ?? DEFAULT_TESTIMONIALS;
           return { ...prev, testimonials: list.filter((t) => t.id !== id) };
         });
         return;
@@ -1151,7 +1151,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     ) => {
       const safeImageUrl = sanitizeGalleryImageUrl(data.imageUrl);
       if (!safeImageUrl) {
-        throw new Error('Please upload a valid JPG, PNG, or WebP photo or provide a valid image URL.');
+        throw new Error('Mohon unggah foto berformat JPG, PNG, atau WebP yang valid atau masukkan tautan gambar.');
       }
       const id = existing?.id || generateSafeDocId('gal');
       const displayOrder = Math.max(0, Math.min(1000, Math.round(Number(data.displayOrder) || 0)));
@@ -1160,14 +1160,14 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         caption: clampText(data.caption, BLUEPRINT_BOUNDS.gallery.captionMax),
         category: data.category,
         imageUrl: safeImageUrl,
-        photographer: clampText(data.photographer || 'Campus Media Team', BLUEPRINT_BOUNDS.gallery.photographerMax),
+        photographer: clampText(data.photographer || 'Unit Media Kampus', BLUEPRINT_BOUNDS.gallery.photographerMax),
         displayOrder,
         active: Boolean(data.active),
       };
 
       if (!user || !isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.galleryPhotos ?? cloudGalleryPhotos;
+          const list = prev.galleryPhotos ?? DEFAULT_GALLERY_PHOTOS;
           const nextItem: GalleryPhoto = {
             id,
             ...sanitized,
@@ -1233,7 +1233,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     async (id: string) => {
       if (!user || !isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.galleryPhotos ?? cloudGalleryPhotos;
+          const list = prev.galleryPhotos ?? DEFAULT_GALLERY_PHOTOS;
           return { ...prev, galleryPhotos: list.filter((p) => p.id !== id) };
         });
         return;
@@ -1268,7 +1268,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     async (photo: GalleryPhoto) => {
       if (!user || !isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.galleryPhotos ?? cloudGalleryPhotos;
+          const list = prev.galleryPhotos ?? DEFAULT_GALLERY_PHOTOS;
           return {
             ...prev,
             galleryPhotos: list.map((p) =>
@@ -1371,7 +1371,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     async (notif: CampusNotification) => {
       if (!user || !isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.notifications ?? cloudNotifications;
+          const list = prev.notifications ?? DEFAULT_NOTIFICATIONS;
           return {
             ...prev,
             notifications: list.map((n) => (n.id === notif.id ? { ...n, active: !n.active } : n)),
@@ -1394,7 +1394,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     async (id: string) => {
       if (!user || !isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.notifications ?? cloudNotifications;
+          const list = prev.notifications ?? DEFAULT_NOTIFICATIONS;
           return { ...prev, notifications: list.filter((n) => n.id !== id) };
         });
         return;
@@ -1423,7 +1423,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       if (!user || !isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.dailyAnalytics ?? cloudDailyAnalytics;
+          const list = prev.dailyAnalytics ?? DEFAULT_DAILY_ANALYTICS;
           const nextRow: DailyAnalytics = {
             id,
             ...sanitized,
@@ -1502,7 +1502,7 @@ export const CampusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         });
       } else if (!isCloudAdmin) {
         updateDemoStore((prev) => {
-          const list = prev.posts ?? cloudPosts;
+          const list = prev.posts ?? DEFAULT_POSTS;
           return {
             ...prev,
             posts: list.map((p) => (p.id === post.id ? { ...p, views: p.views + 1 } : p)),

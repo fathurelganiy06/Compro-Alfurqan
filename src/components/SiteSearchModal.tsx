@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, Calendar, GraduationCap, MessageSquareQuote, Newspaper, Search, X } from 'lucide-react';
 import { useCampus } from '../context/CampusContext';
-import type { AcademicProgram, AgendaEvent, Post } from '../types/cms';
+import type { AcademicProgram, AgendaEvent, Post, PostCategory } from '../types/cms';
 
 interface SiteSearchModalProps {
   isOpen: boolean;
@@ -14,6 +14,12 @@ interface SiteSearchModalProps {
 }
 
 type SearchScope = 'all' | 'programs' | 'posts' | 'agenda' | 'alumni';
+
+function postCategoryLabelId(category: PostCategory): string {
+  if (category === 'announcement') return 'Pengumuman';
+  if (category === 'article') return 'Artikel Ilmiah';
+  return 'Berita Kampus';
+}
 
 export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
   isOpen,
@@ -92,6 +98,7 @@ export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
         p.title.toLowerCase().includes(normalized) ||
         p.excerpt.toLowerCase().includes(normalized) ||
         p.category.toLowerCase().includes(normalized) ||
+        postCategoryLabelId(p.category).toLowerCase().includes(normalized) ||
         p.content.toLowerCase().includes(normalized),
     );
   }, [publishedPosts, normalized, scope]);
@@ -132,7 +139,7 @@ export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
       className="fixed inset-0 z-50 flex items-start justify-center p-4 sm:p-8 pt-12 sm:pt-20"
       role="dialog"
       aria-modal="true"
-      aria-label="Search University Portal"
+      aria-label="Pencarian Portal Kampus"
     >
       <div
         className="fixed inset-0 bg-[#0F1F18]/40 backdrop-blur-[2px]"
@@ -148,7 +155,7 @@ export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
             type="text"
             value={queryText}
             onChange={(e) => setQueryText(e.target.value)}
-            placeholder="Search programs (PAI, PGMI, HKI), news, announcements, agenda, or alumni..."
+            placeholder="Cari program studi (PAI, PGMI, HKI), berita, pengumuman, agenda, atau alumni..."
             className="flex-1 text-sm sm:text-base text-[#0F1F18] placeholder:text-[#76877E] focus:outline-none"
           />
           {queryText && (
@@ -157,13 +164,13 @@ export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
               onClick={() => setQueryText('')}
               className="text-xs font-medium text-[#4A5D54] hover:text-[#0F1F18] cursor-pointer"
             >
-              Clear
+              Hapus
             </button>
           )}
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close search"
+            aria-label="Tutup pencarian"
             className="p-1.5 text-[#4A5D54] hover:text-[#0F1F18] hover:bg-[#F2F5F1] rounded-lg cursor-pointer"
           >
             <X className="w-4 h-4" />
@@ -175,9 +182,9 @@ export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
           <div className="flex items-center gap-1">
             {(
               [
-                ['all', 'All Content'],
-                ['programs', 'Programs'],
-                ['posts', 'News & Notices'],
+                ['all', 'Semua Konten'],
+                ['programs', 'Program Studi'],
+                ['posts', 'Berita & Info'],
                 ['agenda', 'Agenda'],
                 ['alumni', 'Alumni'],
               ] as [SearchScope, string][]
@@ -197,7 +204,7 @@ export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
             ))}
           </div>
           <span className="text-xs text-[#6B7D74] font-mono tabular-nums whitespace-nowrap shrink-0">
-            {totalMatches} result{totalMatches === 1 ? '' : 's'}
+            {totalMatches} hasil
           </span>
         </div>
 
@@ -206,10 +213,10 @@ export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
           {totalMatches === 0 ? (
             <div className="p-10 text-center">
               <p className="text-sm font-medium text-[#0F1F18]">
-                No matches for &ldquo;{queryText}&rdquo;
+                Tidak ada hasil untuk &ldquo;{queryText}&rdquo;
               </p>
               <p className="text-xs text-[#4A5D54] mt-1">
-                Try searching for PAI, Syariah, Tahfidz, KKN, Admissions, or Makassar.
+                Coba kata kunci seperti PAI, Syariah, Tahfidz, KKN, PMB, atau Makassar.
               </p>
             </div>
           ) : (
@@ -217,7 +224,7 @@ export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
               {matchedPrograms.length > 0 && (
                 <div className="p-4">
                   <div className="text-xs font-semibold text-[#4A5D54] px-2 mb-2">
-                    Academic Programs
+                    Program Studi
                   </div>
                   <div className="space-y-1">
                     {matchedPrograms.map((prog) => (
@@ -237,7 +244,7 @@ export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
                               {prog.name}
                             </div>
                             <div className="text-xs text-[#4A5D54] truncate">
-                              {prog.degree} · {prog.faculty} · Accreditation {prog.accreditation}
+                              {prog.degree} · {prog.faculty} · Akreditasi {prog.accreditation}
                             </div>
                           </div>
                         </div>
@@ -251,7 +258,7 @@ export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
               {matchedPosts.length > 0 && (
                 <div className="p-4">
                   <div className="text-xs font-semibold text-[#4A5D54] px-2 mb-2">
-                    News, Articles &amp; Announcements
+                    Berita, Artikel &amp; Pengumuman
                   </div>
                   <div className="space-y-1">
                     {matchedPosts.map((post) => (
@@ -271,8 +278,7 @@ export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
                               {post.title}
                             </div>
                             <div className="text-xs text-[#4A5D54] truncate">
-                              {post.category.charAt(0).toUpperCase() + post.category.slice(1)} ·{' '}
-                              {post.publishedDate} · {post.authorName}
+                              {postCategoryLabelId(post.category)} · {post.publishedDate} · {post.authorName}
                             </div>
                           </div>
                         </div>
@@ -286,7 +292,7 @@ export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
               {matchedAgenda.length > 0 && (
                 <div className="p-4">
                   <div className="text-xs font-semibold text-[#4A5D54] px-2 mb-2">
-                    Campus Agenda
+                    Agenda Kampus
                   </div>
                   <div className="space-y-1">
                     {matchedAgenda.map((evt) => (
@@ -320,7 +326,7 @@ export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
               {matchedAlumni.length > 0 && (
                 <div className="p-4">
                   <div className="text-xs font-semibold text-[#4A5D54] px-2 mb-2">
-                    Alumni Stories
+                    Testimoni Alumni
                   </div>
                   <div className="space-y-1">
                     {matchedAlumni.map((item) => (
@@ -340,7 +346,7 @@ export const SiteSearchModal: React.FC<SiteSearchModalProps> = ({
                               {item.name} — {item.role}
                             </div>
                             <div className="text-xs text-[#4A5D54] truncate">
-                              Class of {item.graduationYear} · {item.program} · {item.organization}
+                              Angkatan {item.graduationYear} · {item.program} · {item.organization}
                             </div>
                           </div>
                         </div>

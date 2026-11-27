@@ -48,11 +48,11 @@ export class ErrorBoundary extends React.Component<Props, State> {
           <div className="max-w-lg w-full bg-white border border-[#E2E8E2] rounded-xl p-8">
             <div className="flex items-center gap-3 text-[#0F1F18] mb-3">
               <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0" />
-              <h2 className="text-xl font-semibold">Application Recovery</h2>
+              <h2 className="text-xl font-semibold">Pemulihan Aplikasi</h2>
             </div>
             <p className="text-sm text-[#4A5D54] leading-relaxed mb-4">
-              The portal encountered a runtime or database permission issue. You can retry loading
-              the current view without losing saved records.
+              Portal mengalami kendala teknis atau izin data sementara. Anda dapat mencoba memuat
+              ulang tampilan tanpa kehilangan data yang tersimpan.
             </p>
             <div className="bg-[#F2F5F1] border border-[#E2E8E2] rounded-lg p-3 text-xs font-mono text-[#0F1F18] break-words mb-6">
               {displayDetail}
@@ -64,14 +64,14 @@ export class ErrorBoundary extends React.Component<Props, State> {
                 className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg transition-colors cursor-pointer"
               >
                 <RefreshCw className="w-4 h-4" />
-                Retry View
+                Coba Lagi
               </button>
               <button
                 type="button"
                 onClick={() => window.location.reload()}
                 className="px-4 py-2 text-sm font-medium text-[#0F1F18] border border-[#D4DDD6] hover:bg-[#F2F5F1] rounded-lg transition-colors cursor-pointer"
               >
-                Reload Page
+                Muat Ulang Halaman
               </button>
             </div>
           </div>

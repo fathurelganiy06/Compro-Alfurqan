@@ -285,10 +285,10 @@ export function sanitizeGalleryImageUrl(value: string): string {
 export async function compressImageFileToDataUrl(file: File): Promise<string> {
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   if (!allowedTypes.includes(file.type)) {
-    throw new Error('Please upload a JPG, PNG, or WebP image file.');
+    throw new Error('Mohon unggah berkas gambar berformat JPG, PNG, atau WebP.');
   }
   if (file.size > 15 * 1024 * 1024) {
-    throw new Error('Image file must be under 15 MB.');
+    throw new Error('Ukuran berkas gambar maksimal 15 MB.');
   }
 
   const objectUrl = URL.createObjectURL(file);
@@ -296,7 +296,7 @@ export async function compressImageFileToDataUrl(file: File): Promise<string> {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
       const el = new Image();
       el.onload = () => resolve(el);
-      el.onerror = () => reject(new Error('Unable to read the selected image file.'));
+      el.onerror = () => reject(new Error('Berkas gambar yang dipilih tidak dapat dibaca.'));
       el.src = objectUrl;
     });
 
@@ -314,7 +314,7 @@ export async function compressImageFileToDataUrl(file: File): Promise<string> {
     canvas.height = height;
     const ctx = canvas.getContext('2d');
     if (!ctx) {
-      throw new Error('Canvas image processing is unavailable in this browser.');
+      throw new Error('Pemrosesan gambar tidak tersedia di peramban ini.');
     }
     ctx.drawImage(img, 0, 0, width, height);
 
@@ -332,7 +332,7 @@ export async function compressImageFileToDataUrl(file: File): Promise<string> {
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     const fallbackUrl = canvas.toDataURL('image/jpeg', 0.58);
     if (fallbackUrl.length > 340000) {
-      throw new Error('Image could not be compressed under the storage limit. Try a smaller photo.');
+      throw new Error('Gambar tidak dapat dikompresi di bawah batas penyimpanan. Coba gunakan foto berukuran lebih kecil.');
     }
     return fallbackUrl;
   } finally {

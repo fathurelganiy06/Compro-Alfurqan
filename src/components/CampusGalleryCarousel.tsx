@@ -12,23 +12,23 @@ import type { GalleryCategory, GalleryPhoto } from '../types/cms';
 import { ResilientImage } from './ResilientImage';
 
 const CATEGORY_TABS: { id: 'all' | GalleryCategory; label: string }[] = [
-  { id: 'all', label: 'All Moments' },
-  { id: 'campus', label: 'Campus' },
-  { id: 'academics', label: 'Academics' },
-  { id: 'student-life', label: 'Student Life' },
-  { id: 'events', label: 'Events' },
+  { id: 'all', label: 'Semua Momen' },
+  { id: 'campus', label: 'Kampus' },
+  { id: 'academics', label: 'Akademik' },
+  { id: 'student-life', label: 'Kemahasiswaan' },
+  { id: 'events', label: 'Kegiatan' },
 ];
 
 function formatGalleryCategory(category: GalleryCategory): string {
   switch (category) {
     case 'campus':
-      return 'Campus Architecture';
+      return 'Arsitektur Kampus';
     case 'academics':
-      return 'Academic Life';
+      return 'Kegiatan Akademik';
     case 'student-life':
-      return 'Student Life';
+      return 'Kehidupan Mahasiswa';
     case 'events':
-      return 'Campus Events';
+      return 'Agenda & Acara';
   }
 }
 
@@ -52,7 +52,6 @@ export const CampusGalleryCarousel: React.FC = () => {
     return active.filter((p) => p.category === categoryFilter);
   }, [galleryPhotos, categoryFilter]);
 
-  // Clamp activeIndex cleanly whenever filter or Firestore list updates
   const safeIndex = visiblePhotos.length > 0 ? Math.min(activeIndex, visiblePhotos.length - 1) : 0;
   const activePhoto: GalleryPhoto | undefined = visiblePhotos[safeIndex];
 
@@ -66,7 +65,6 @@ export const CampusGalleryCarousel: React.FC = () => {
     setActiveIndex((prev) => (prev - 1 + visiblePhotos.length) % visiblePhotos.length);
   }, [visiblePhotos.length]);
 
-  // Auto-advance timer (pauses on hover, lightbox open, or single slide)
   useEffect(() => {
     if (!isAutoPlaying || isHovered || lightboxOpen || visiblePhotos.length <= 1) return;
     const timer = window.setInterval(() => {
@@ -75,7 +73,6 @@ export const CampusGalleryCarousel: React.FC = () => {
     return () => window.clearInterval(timer);
   }, [isAutoPlaying, isHovered, lightboxOpen, visiblePhotos.length]);
 
-  // Keyboard navigation while lightbox is open
   useEffect(() => {
     if (!lightboxOpen) return;
     const onKeyDown = (e: KeyboardEvent) => {
@@ -98,7 +95,7 @@ export const CampusGalleryCarousel: React.FC = () => {
 
   const handleOpenLightbox = () => {
     if (!activePhoto) return;
-    trackInteraction('page_view', `Campus Gallery: ${activePhoto.title}`);
+    trackInteraction('page_view', `Galeri Kampus: ${activePhoto.title}`);
     setLightboxOpen(true);
   };
 
@@ -113,16 +110,16 @@ export const CampusGalleryCarousel: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="max-w-2xl">
           <p className="text-xs font-semibold text-[#0E5A36] mb-2">
-            04. Campus Life Gallery
+            04. Galeri Kehidupan Kampus
           </p>
           <h2 className="font-editorial text-2xl sm:text-4xl font-semibold text-[#0F1F18] leading-tight">
-            Everyday Scholarship, Community &amp; Campus Architecture
+            Potret Keseharian Akademik, Kebersamaan &amp; Lingkungan Kampus
           </h2>
         </div>
 
         <div
           role="tablist"
-          aria-label="Filter campus life gallery by category"
+          aria-label="Filter galeri kehidupan kampus berdasarkan kategori"
           className="inline-flex flex-wrap items-center gap-1 p-1 bg-white border border-[#D4DDD6] rounded-lg self-start md:self-auto"
         >
           {CATEGORY_TABS.map((tab) => (
@@ -147,7 +144,7 @@ export const CampusGalleryCarousel: React.FC = () => {
       {visiblePhotos.length === 0 || !activePhoto ? (
         <div className="bg-white border border-[#E2E8E2] rounded-xl p-12 text-center">
           <p className="text-sm text-[#4A5D54]">
-            No published campus photographs in this category yet.
+            Belum ada dokumentasi foto kampus yang dipublikasikan untuk kategori ini.
           </p>
         </div>
       ) : (
@@ -161,7 +158,7 @@ export const CampusGalleryCarousel: React.FC = () => {
           }}
           tabIndex={0}
           aria-roledescription="carousel"
-          aria-label="Campus Life Photo Gallery"
+          aria-label="Galeri Foto Kehidupan Kampus"
         >
           {/* Dominant 16:9 Stage */}
           <div className="relative aspect-[16/9] max-h-[540px] w-full bg-[#092919] overflow-hidden">
@@ -173,16 +170,14 @@ export const CampusGalleryCarousel: React.FC = () => {
               fallbackTitle={activePhoto.title}
             />
 
-            {/* Subtle Edge Gradient for Control Legibility */}
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#071F13]/75 via-[#071F13]/25 to-transparent" />
 
-            {/* Previous / Next Controls */}
             {visiblePhotos.length > 1 && (
               <>
                 <button
                   type="button"
                   onClick={handlePrev}
-                  aria-label="Previous campus photo"
+                  aria-label="Foto kampus sebelumnya"
                   className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-[#071F13]/75 hover:bg-[#0E5A36] text-white border border-white/20 flex items-center justify-center transition-colors cursor-pointer"
                 >
                   <ChevronLeft className="w-5 h-5" />
@@ -190,7 +185,7 @@ export const CampusGalleryCarousel: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleNext}
-                  aria-label="Next campus photo"
+                  aria-label="Foto kampus berikutnya"
                   className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-[#071F13]/75 hover:bg-[#0E5A36] text-white border border-white/20 flex items-center justify-center transition-colors cursor-pointer"
                 >
                   <ChevronRight className="w-5 h-5" />
@@ -198,24 +193,23 @@ export const CampusGalleryCarousel: React.FC = () => {
               </>
             )}
 
-            {/* Top-Right Utility Controls (Auto-play + Fullscreen) */}
             <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-2">
               {visiblePhotos.length > 1 && (
                 <button
                   type="button"
                   onClick={() => setIsAutoPlaying((v) => !v)}
-                  aria-label={isAutoPlaying ? 'Pause slideshow' : 'Play slideshow'}
+                  aria-label={isAutoPlaying ? 'Jeda tayangan otomatis' : 'Putar tayangan otomatis'}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#071F13]/75 hover:bg-[#0E5A36] border border-white/20 rounded-lg transition-colors cursor-pointer"
                 >
                   {isAutoPlaying ? (
                     <>
                       <Pause className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Pause</span>
+                      <span className="hidden sm:inline">Jeda</span>
                     </>
                   ) : (
                     <>
                       <Play className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Play</span>
+                      <span className="hidden sm:inline">Putar</span>
                     </>
                   )}
                 </button>
@@ -223,15 +217,14 @@ export const CampusGalleryCarousel: React.FC = () => {
               <button
                 type="button"
                 onClick={handleOpenLightbox}
-                aria-label="Open photograph in fullscreen"
+                aria-label="Buka foto dalam layar penuh"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#071F13]/75 hover:bg-[#0E5A36] border border-white/20 rounded-lg transition-colors cursor-pointer"
               >
                 <Maximize2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Expand</span>
+                <span className="hidden sm:inline">Perbesar</span>
               </button>
             </div>
 
-            {/* Bottom-Left Slide Index Readout */}
             <div className="absolute bottom-3 left-4 sm:bottom-4 sm:left-6 font-mono text-xs font-medium text-white/95 tabular-nums tracking-wider">
               {slideCounter}
             </div>
@@ -245,7 +238,7 @@ export const CampusGalleryCarousel: React.FC = () => {
                   {formatGalleryCategory(activePhoto.category)}
                 </span>
                 <span aria-hidden="true"> · </span>
-                <span>Photo by {activePhoto.photographer}</span>
+                <span>Dokumentasi oleh {activePhoto.photographer}</span>
               </div>
               <h3 className="font-editorial text-xl sm:text-2xl font-semibold text-[#0F1F18] leading-snug">
                 {activePhoto.title}
@@ -262,14 +255,14 @@ export const CampusGalleryCarousel: React.FC = () => {
                   onClick={handlePrev}
                   className="px-3 py-1.5 text-xs font-medium text-[#0F1F18] border border-[#D4DDD6] hover:bg-[#F2F5F1] rounded-lg transition-colors cursor-pointer"
                 >
-                  Previous
+                  Sebelumnya
                 </button>
                 <button
                   type="button"
                   onClick={handleNext}
                   className="px-3 py-1.5 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg transition-colors cursor-pointer"
                 >
-                  Next Slide
+                  Slide Berikutnya
                 </button>
               </div>
             )}
@@ -281,7 +274,7 @@ export const CampusGalleryCarousel: React.FC = () => {
               <div
                 className="flex items-center gap-3 overflow-x-auto pb-1"
                 role="listbox"
-                aria-label="Select campus photograph"
+                aria-label="Pilih foto kampus"
               >
                 {visiblePhotos.map((photo, idx) => {
                   const selected = idx === safeIndex;
@@ -348,7 +341,7 @@ export const CampusGalleryCarousel: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setLightboxOpen(false)}
-                aria-label="Close fullscreen gallery"
+                aria-label="Tutup tampilan layar penuh"
                 className="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -368,7 +361,7 @@ export const CampusGalleryCarousel: React.FC = () => {
                   <button
                     type="button"
                     onClick={handlePrev}
-                    aria-label="Previous photo"
+                    aria-label="Foto sebelumnya"
                     className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-black/60 hover:bg-[#0E5A36] text-white border border-white/20 flex items-center justify-center cursor-pointer"
                   >
                     <ChevronLeft className="w-5 h-5" />
@@ -376,7 +369,7 @@ export const CampusGalleryCarousel: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleNext}
-                    aria-label="Next photo"
+                    aria-label="Foto berikutnya"
                     className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-lg bg-black/60 hover:bg-[#0E5A36] text-white border border-white/20 flex items-center justify-center cursor-pointer"
                   >
                     <ChevronRight className="w-5 h-5" />

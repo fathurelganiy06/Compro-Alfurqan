@@ -12,6 +12,30 @@ import {
 } from 'recharts';
 import { Plus, Smartphone, TrendingUp } from 'lucide-react';
 import { useCampus } from '../context/CampusContext';
+import type { AnalyticsEventType, PostCategory } from '../types/cms';
+
+function categoryLabelId(cat: PostCategory): string {
+  if (cat === 'announcement') return 'Pengumuman';
+  if (cat === 'article') return 'Artikel Ilmiah';
+  return 'Berita Kampus';
+}
+
+function eventTypeLabelId(eventType: AnalyticsEventType): string {
+  switch (eventType) {
+    case 'page_view':
+      return 'Kunjungan Halaman';
+    case 'search':
+      return 'Pencarian Situs';
+    case 'article_read':
+      return 'Baca Publikasi';
+    case 'program_view':
+      return 'Lihat Program Studi';
+    case 'map_interact':
+      return 'Interaksi Peta Kampus';
+    default:
+      return eventType;
+  }
+}
 
 export const AnalyticsDashboard: React.FC = () => {
   const {
@@ -66,9 +90,9 @@ export const AnalyticsDashboard: React.FC = () => {
       .filter((p) => p.category === 'announcement')
       .reduce((acc, p) => acc + p.views, 0);
     return [
-      { category: 'Announcements', views: announcementViews },
-      { category: 'Campus News', views: newsViews },
-      { category: 'Articles', views: articleViews },
+      { category: 'Pengumuman', views: announcementViews },
+      { category: 'Berita Kampus', views: newsViews },
+      { category: 'Artikel', views: articleViews },
     ];
   }, [posts]);
 
@@ -83,11 +107,11 @@ export const AnalyticsDashboard: React.FC = () => {
       eventType: ev.eventType,
       label: ev.label,
       timestamp: ev.createdAtMs ?? Date.now(),
-      source: 'Firestore',
+      source: 'Basis Data',
     }));
     const localItems = sessionTelemetry.recentEvents.map((ev) => ({
       ...ev,
-      source: 'Live Session',
+      source: 'Sesi Aktif',
     }));
     return [...firestoreItems, ...localItems]
       .sort((a, b) => b.timestamp - a.timestamp)
@@ -98,9 +122,9 @@ export const AnalyticsDashboard: React.FC = () => {
     setLoggingSnapshot(true);
     try {
       const todayIso = new Date().toISOString().slice(0, 10);
-      const dateLabel = new Date().toLocaleDateString('en-US', {
-        month: 'short',
+      const dateLabel = new Date().toLocaleDateString('id-ID', {
         day: 'numeric',
+        month: 'short',
       });
       const latest = dailyAnalytics[dailyAnalytics.length - 1];
       await recordDailyAnalytics({
@@ -123,10 +147,10 @@ export const AnalyticsDashboard: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="font-editorial text-2xl font-semibold text-[#0F1F18]">
-            Site Analytics Overview
+            Ringkasan Analitik Situs
           </h2>
           <p className="text-xs text-[#4A5D54] mt-0.5">
-            Real-time traffic, search behavior, and publication engagement across STAI Al-Furqan Portal
+            Trafik kunjungan, aktivitas pencarian, dan keterbacaan publikasi di Portal STAI Al-Furqan Makassar
           </p>
         </div>
 
@@ -143,7 +167,7 @@ export const AnalyticsDashboard: React.FC = () => {
                     : 'text-[#4A5D54] hover:text-[#0F1F18]'
                 }`}
               >
-                {days} Days
+                {days} Hari
               </button>
             ))}
           </div>
@@ -154,7 +178,7 @@ export const AnalyticsDashboard: React.FC = () => {
             className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium text-white bg-[#0E5A36] hover:bg-[#093E25] disabled:opacity-60 rounded-lg transition-colors whitespace-nowrap cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            {loggingSnapshot ? 'Syncing...' : 'Sync Today Snapshot'}
+            {loggingSnapshot ? 'Menyimpan...' : 'Catat Snapshot Hari Ini'}
           </button>
         </div>
       </div>
@@ -162,44 +186,44 @@ export const AnalyticsDashboard: React.FC = () => {
       {/* 4 Flat KPI Summary Cells */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white border border-[#E2E8E2] rounded-xl p-5">
-          <div className="text-xs text-[#4A5D54]">Unique Visitors ({rangeDays}d)</div>
+          <div className="text-xs text-[#4A5D54]">Pengunjung Unik ({rangeDays} hari)</div>
           <div className="font-mono text-2xl font-semibold text-[#0F1F18] tabular-nums mt-1.5">
-            {totals.visitors.toLocaleString()}
+            {totals.visitors.toLocaleString('id-ID')}
           </div>
           <div className="text-xs text-[#0E5A36] mt-1 inline-flex items-center gap-1">
             <TrendingUp className="w-3.5 h-3.5" />
-            Admissions season growth
+            Pertumbuhan musim PMB
           </div>
         </div>
 
         <div className="bg-white border border-[#E2E8E2] rounded-xl p-5">
-          <div className="text-xs text-[#4A5D54]">Total Page Views</div>
+          <div className="text-xs text-[#4A5D54]">Total Tayangan Halaman</div>
           <div className="font-mono text-2xl font-semibold text-[#0F1F18] tabular-nums mt-1.5">
-            {totals.pageViews.toLocaleString()}
+            {totals.pageViews.toLocaleString('id-ID')}
           </div>
           <div className="text-xs text-[#6B7D74] mt-1 tabular-nums">
-            {posts.length} posts · {programs.length} programs · {agenda.length} events
+            {posts.length} publikasi · {programs.length} prodi · {agenda.length} agenda
           </div>
         </div>
 
         <div className="bg-white border border-[#E2E8E2] rounded-xl p-5">
-          <div className="text-xs text-[#4A5D54]">Integrated Site Searches</div>
+          <div className="text-xs text-[#4A5D54]">Pencarian Situs Terpadu</div>
           <div className="font-mono text-2xl font-semibold text-[#0F1F18] tabular-nums mt-1.5">
-            {totals.searches.toLocaleString()}
+            {totals.searches.toLocaleString('id-ID')}
           </div>
           <div className="text-xs text-[#6B7D74] mt-1 tabular-nums">
-            +{sessionTelemetry.searches} in current session
+            +{sessionTelemetry.searches} pada sesi saat ini
           </div>
         </div>
 
         <div className="bg-white border border-[#E2E8E2] rounded-xl p-5">
-          <div className="text-xs text-[#4A5D54]">Mobile Visitor Share</div>
+          <div className="text-xs text-[#4A5D54]">Porsi Pengunjung Seluler</div>
           <div className="font-mono text-2xl font-semibold text-[#0F1F18] tabular-nums mt-1.5">
             {totals.avgMobile}%
           </div>
           <div className="text-xs text-[#6B7D74] mt-1 inline-flex items-center gap-1">
             <Smartphone className="w-3.5 h-3.5 text-[#0E5A36]" />
-            Responsive mobile primary
+            Dominan perangkat seluler
           </div>
         </div>
       </div>
@@ -211,20 +235,20 @@ export const AnalyticsDashboard: React.FC = () => {
           <div className="flex items-center justify-between gap-4 mb-5">
             <div>
               <h3 className="text-base font-semibold text-[#0F1F18]">
-                Daily Visitors &amp; Page Views
+                Pengunjung Harian &amp; Tayangan Halaman
               </h3>
               <p className="text-xs text-[#4A5D54]">
-                Firestore-persisted traffic trend with live session telemetry overlay
+                Tren kunjungan tersimpan dengan pembaruan telemetri sesi langsung
               </p>
             </div>
             <div className="flex items-center gap-4 text-xs text-[#4A5D54]">
               <span className="inline-flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-xs bg-[#0E5A36]" />
-                Page Views
+                Tayangan Halaman
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-xs bg-[#C49A2C]" />
-                Visitors
+                Pengunjung
               </span>
             </div>
           </div>
@@ -265,7 +289,7 @@ export const AnalyticsDashboard: React.FC = () => {
                 <Area
                   type="monotone"
                   dataKey="pageViews"
-                  name="Page Views"
+                  name="Tayangan Halaman"
                   stroke="#0E5A36"
                   strokeWidth={2}
                   fill="url(#viewsFill)"
@@ -273,7 +297,7 @@ export const AnalyticsDashboard: React.FC = () => {
                 <Area
                   type="monotone"
                   dataKey="visitors"
-                  name="Visitors"
+                  name="Pengunjung"
                   stroke="#C49A2C"
                   strokeWidth={2}
                   fill="url(#visitorsFill)"
@@ -286,10 +310,10 @@ export const AnalyticsDashboard: React.FC = () => {
         {/* Category Engagement Bar Chart */}
         <div className="lg:col-span-4 bg-white border border-[#E2E8E2] rounded-xl p-6">
           <h3 className="text-base font-semibold text-[#0F1F18] mb-1">
-            Reads by Content Category
+            Pembaca per Kategori Konten
           </h3>
           <p className="text-xs text-[#4A5D54] mb-5">
-            Cumulative views across CMS publications
+            Akumulasi tayangan seluruh publikasi CMS
           </p>
 
           <div className="h-[290px] w-full">
@@ -318,7 +342,7 @@ export const AnalyticsDashboard: React.FC = () => {
                     fontSize: '12px',
                   }}
                 />
-                <Bar dataKey="views" name="Total Views" fill="#0E5A36" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="views" name="Total Tayangan" fill="#0E5A36" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -330,17 +354,17 @@ export const AnalyticsDashboard: React.FC = () => {
         <div className="lg:col-span-7 bg-white border border-[#E2E8E2] rounded-xl overflow-hidden">
           <div className="px-6 py-4 border-b border-[#E2E8E2]">
             <h3 className="text-base font-semibold text-[#0F1F18]">
-              Top Performing Content
+              Konten Terpopuler
             </h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-[#E2E8E2] bg-[#FAFBF9] text-[11px] font-semibold text-[#4A5D54]">
-                  <th className="py-2.5 px-6">Title</th>
-                  <th className="py-2.5 px-4">Type</th>
-                  <th className="py-2.5 px-4">Date</th>
-                  <th className="py-2.5 px-6 text-right">Views</th>
+                  <th className="py-2.5 px-6">Judul</th>
+                  <th className="py-2.5 px-4">Kategori</th>
+                  <th className="py-2.5 px-4">Tanggal</th>
+                  <th className="py-2.5 px-6 text-right">Tayangan</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#EDF1EE] text-xs">
@@ -349,12 +373,14 @@ export const AnalyticsDashboard: React.FC = () => {
                     <td className="py-3 px-6 font-medium text-[#0F1F18] max-w-xs truncate">
                       {post.title}
                     </td>
-                    <td className="py-3 px-4 text-[#4A5D54] capitalize">{post.category}</td>
+                    <td className="py-3 px-4 text-[#4A5D54] whitespace-nowrap">
+                      {categoryLabelId(post.category)}
+                    </td>
                     <td className="py-3 px-4 font-mono text-[#6B7D74] tabular-nums whitespace-nowrap">
                       {post.publishedDate}
                     </td>
                     <td className="py-3 px-6 font-mono font-semibold text-[#0F1F18] text-right tabular-nums">
-                      {post.views.toLocaleString()}
+                      {post.views.toLocaleString('id-ID')}
                     </td>
                   </tr>
                 ))}
@@ -366,13 +392,13 @@ export const AnalyticsDashboard: React.FC = () => {
         <div className="lg:col-span-5 bg-white border border-[#E2E8E2] rounded-xl overflow-hidden">
           <div className="px-6 py-4 border-b border-[#E2E8E2]">
             <h3 className="text-base font-semibold text-[#0F1F18]">
-              Recent Interaction Stream
+              Aktivitas Interaksi Terbaru
             </h3>
           </div>
           <div className="divide-y divide-[#EDF1EE] max-h-[300px] overflow-y-auto">
             {mergedActivity.length === 0 ? (
               <div className="p-8 text-center text-xs text-[#4A5D54]">
-                Browse articles, search programs, or explore the campus map to observe live events.
+                Jelajahi artikel, cari program studi, atau buka peta kampus untuk melihat aktivitas langsung.
               </div>
             ) : (
               mergedActivity.map((ev) => (
@@ -380,11 +406,11 @@ export const AnalyticsDashboard: React.FC = () => {
                   <div className="min-w-0">
                     <div className="font-medium text-[#0F1F18] truncate">{ev.label}</div>
                     <div className="text-[11px] text-[#6B7D74]">
-                      {ev.eventType.replace('_', ' ')} · {ev.source}
+                      {eventTypeLabelId(ev.eventType)} · {ev.source}
                     </div>
                   </div>
                   <span className="font-mono text-[11px] text-[#6B7D74] tabular-nums shrink-0">
-                    {new Date(ev.timestamp).toLocaleTimeString([], {
+                    {new Date(ev.timestamp).toLocaleTimeString('id-ID', {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}

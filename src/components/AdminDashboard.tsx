@@ -62,15 +62,41 @@ interface AdminDashboardProps {
 }
 
 const NAV_ITEMS: { id: AdminTab; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
-  { id: 'analytics', label: 'Site Analytics', Icon: BarChart3 },
-  { id: 'posts', label: 'News & Notices', Icon: Newspaper },
-  { id: 'programs', label: 'Programs', Icon: GraduationCap },
-  { id: 'agenda', label: 'Campus Agenda', Icon: Calendar },
-  { id: 'gallery', label: 'Campus Gallery', Icon: Images },
-  { id: 'alumni', label: 'Alumni Stories', Icon: MessageSquareQuote },
-  { id: 'notifications', label: 'Live Alerts', Icon: Bell },
-  { id: 'settings', label: 'Site Profile', Icon: Settings },
+  { id: 'analytics', label: 'Analitik Situs', Icon: BarChart3 },
+  { id: 'posts', label: 'Berita & Info', Icon: Newspaper },
+  { id: 'programs', label: 'Program Studi', Icon: GraduationCap },
+  { id: 'agenda', label: 'Agenda Kampus', Icon: Calendar },
+  { id: 'gallery', label: 'Galeri Kampus', Icon: Images },
+  { id: 'alumni', label: 'Kisah Alumni', Icon: MessageSquareQuote },
+  { id: 'notifications', label: 'Notifikasi Live', Icon: Bell },
+  { id: 'settings', label: 'Profil Situs', Icon: Settings },
 ];
+
+function postCategoryLabel(cat: PostCategory): string {
+  if (cat === 'announcement') return 'Pengumuman';
+  if (cat === 'article') return 'Artikel Ilmiah';
+  return 'Berita';
+}
+
+function agendaStatusLabel(status: AgendaStatus): string {
+  if (status === 'ongoing') return 'Berlangsung';
+  if (status === 'completed') return 'Selesai';
+  return 'Akan Datang';
+}
+
+function galleryCategoryLabel(cat: GalleryCategory): string {
+  if (cat === 'academics') return 'Akademik';
+  if (cat === 'student-life') return 'Kemahasiswaan';
+  if (cat === 'events') return 'Kegiatan';
+  return 'Kampus';
+}
+
+function notifTypeLabel(type: CampusNotification['type']): string {
+  if (type === 'urgent') return 'Info Penting';
+  if (type === 'agenda') return 'Agenda';
+  if (type === 'news') return 'Berita Kampus';
+  return 'Pengumuman';
+}
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }) => {
   const {
@@ -123,7 +149,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
     excerpt: '',
     content: '',
     coverImage: COVER_IMAGE_PRESETS[0].url as string,
-    authorName: 'Campus Public Relations',
+    authorName: 'Humas Kampus',
     status: 'published' as PostStatus,
     priority: 'normal' as PostPriority,
     featured: false,
@@ -139,9 +165,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
     code: '',
     name: '',
     degree: 'S1' as DegreeLevel,
-    faculty: 'Faculty of Tarbiyah',
+    faculty: 'Fakultas Tarbiyah',
     accreditation: 'Baik',
-    duration: '8 Semesters',
+    duration: '8 Semester',
     credits: 144,
     summary: '',
     careerOutcomes: '',
@@ -155,9 +181,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
   const [agendaForm, setAgendaForm] = useState({
     title: '',
     eventDate: new Date().toISOString().slice(0, 10),
-    timeRange: '09:00 – 12:00 WITA',
-    location: 'Main Auditorium, Daya Campus',
-    organizer: 'Academic Administration Bureau',
+    timeRange: '09.00 – 12.00 WITA',
+    location: 'Auditorium Utama, Kampus Daya',
+    organizer: 'Biro Administrasi Akademik',
     category: 'academic' as AgendaCategory,
     description: '',
     status: 'upcoming' as AgendaStatus,
@@ -191,7 +217,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
     caption: '',
     category: 'campus' as GalleryCategory,
     imageUrl: '',
-    photographer: 'Campus Media Bureau',
+    photographer: 'Unit Media Kampus',
     displayOrder: 1,
     active: true,
   });
@@ -269,7 +295,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
       excerpt: '',
       content: '',
       coverImage: COVER_IMAGE_PRESETS[0].url,
-      authorName: user?.displayName || 'Campus Public Relations',
+      authorName: user?.displayName || 'Humas Kampus',
       status: 'published',
       priority: 'normal',
       featured: false,
@@ -303,7 +329,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
   const submitPost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (postForm.title.trim().length < 4 || postForm.excerpt.trim().length < 10 || postForm.content.trim().length < 20) {
-      showFeedback('error', 'Please complete title (4+ chars), excerpt (10+ chars), and body (20+ chars).');
+      showFeedback('error', 'Mohon lengkapi judul (minimal 4 karakter), ringkasan (minimal 10 karakter), dan isi artikel (minimal 20 karakter).');
       return;
     }
     setBusy(true);
@@ -313,10 +339,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
       setPostModalOpen(false);
       showFeedback(
         'success',
-        editingPost ? 'Publication updated live.' : 'Publication saved and published.',
+        editingPost ? 'Publikasi berhasil diperbarui.' : 'Publikasi berhasil disimpan dan diterbitkan.',
       );
     } catch (err) {
-      showFeedback('error', err instanceof Error ? err.message : 'Failed to save publication.');
+      showFeedback('error', err instanceof Error ? err.message : 'Gagal menyimpan publikasi.');
     } finally {
       setBusy(false);
     }
@@ -328,9 +354,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
       code: '',
       name: '',
       degree: 'S1',
-      faculty: 'Faculty of Tarbiyah',
+      faculty: 'Fakultas Tarbiyah',
       accreditation: 'Baik',
-      duration: '8 Semesters',
+      duration: '8 Semester',
       credits: 144,
       summary: '',
       careerOutcomes: '',
@@ -361,16 +387,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
   const submitProgram = async (e: React.FormEvent) => {
     e.preventDefault();
     if (programForm.name.trim().length < 3 || programForm.summary.trim().length < 10) {
-      showFeedback('error', 'Please enter a valid program name and summary (10+ chars).');
+      showFeedback('error', 'Mohon masukkan nama program studi dan ringkasan yang valid (minimal 10 karakter).');
       return;
     }
     setBusy(true);
     try {
       await saveProgram(programForm, editingProgram);
       setProgramModalOpen(false);
-      showFeedback('success', 'Academic program saved live.');
+      showFeedback('success', 'Data program studi berhasil disimpan.');
     } catch (err) {
-      showFeedback('error', err instanceof Error ? err.message : 'Failed to save program.');
+      showFeedback('error', err instanceof Error ? err.message : 'Gagal menyimpan program studi.');
     } finally {
       setBusy(false);
     }
@@ -381,9 +407,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
     setAgendaForm({
       title: '',
       eventDate: new Date().toISOString().slice(0, 10),
-      timeRange: '09:00 – 12:00 WITA',
-      location: 'Main Auditorium, Daya Campus',
-      organizer: 'Academic Administration Bureau',
+      timeRange: '09.00 – 12.00 WITA',
+      location: 'Auditorium Utama, Kampus Daya',
+      organizer: 'Biro Administrasi Akademik',
       category: 'academic',
       description: '',
       status: 'upcoming',
@@ -413,7 +439,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
   const submitAgenda = async (e: React.FormEvent) => {
     e.preventDefault();
     if (agendaForm.title.trim().length < 4 || agendaForm.description.trim().length < 10) {
-      showFeedback('error', 'Please provide an event title and description (10+ chars).');
+      showFeedback('error', 'Mohon isi judul kegiatan dan deskripsi (minimal 10 karakter).');
       return;
     }
     setBusy(true);
@@ -421,9 +447,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
       const { alsoNotify, ...payload } = agendaForm;
       await saveAgenda(payload, editingAgenda, alsoNotify);
       setAgendaModalOpen(false);
-      showFeedback('success', 'Agenda event saved live.');
+      showFeedback('success', 'Agenda kampus berhasil disimpan.');
     } catch (err) {
-      showFeedback('error', err instanceof Error ? err.message : 'Failed to save agenda event.');
+      showFeedback('error', err instanceof Error ? err.message : 'Gagal menyimpan agenda kampus.');
     } finally {
       setBusy(false);
     }
@@ -462,16 +488,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
   const submitAlumni = async (e: React.FormEvent) => {
     e.preventDefault();
     if (alumniForm.name.trim().length < 2 || alumniForm.quote.trim().length < 15) {
-      showFeedback('error', 'Please enter alumni name and testimonial quote (15+ chars).');
+      showFeedback('error', 'Mohon isi nama alumni dan kutipan testimoni (minimal 15 karakter).');
       return;
     }
     setBusy(true);
     try {
       await saveTestimonial(alumniForm, editingAlumni);
       setAlumniModalOpen(false);
-      showFeedback('success', 'Alumni testimonial saved live.');
+      showFeedback('success', 'Testimoni alumni berhasil disimpan.');
     } catch (err) {
-      showFeedback('error', err instanceof Error ? err.message : 'Failed to save testimonial.');
+      showFeedback('error', err instanceof Error ? err.message : 'Gagal menyimpan testimoni.');
     } finally {
       setBusy(false);
     }
@@ -498,7 +524,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
       caption: '',
       category: 'campus',
       imageUrl: '',
-      photographer: user?.displayName || 'Campus Media Bureau',
+      photographer: user?.displayName || 'Unit Media Kampus',
       displayOrder: nextOrder,
       active: true,
     });
@@ -546,7 +572,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 .slice(0, 140),
       }));
     } catch (err) {
-      setGalleryUploadError(err instanceof Error ? err.message : 'Unable to process image file.');
+      setGalleryUploadError(err instanceof Error ? err.message : 'Gagal memproses berkas gambar.');
     } finally {
       setGalleryUploadBusy(false);
     }
@@ -555,11 +581,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
   const submitGalleryPhoto = async (e: React.FormEvent) => {
     e.preventDefault();
     if (galleryForm.title.trim().length < 3 || galleryForm.caption.trim().length < 5) {
-      showFeedback('error', 'Please enter a photo title (3+ chars) and caption (5+ chars).');
+      showFeedback('error', 'Mohon isi judul foto (minimal 3 karakter) dan keterangan (minimal 5 karakter).');
       return;
     }
     if (!sanitizeGalleryImageUrl(galleryForm.imageUrl)) {
-      showFeedback('error', 'Please upload a photo, choose a preset, or enter a valid https:// image URL.');
+      showFeedback('error', 'Mohon unggah foto, pilih foto bawaan, atau masukkan tautan gambar https:// yang valid.');
       return;
     }
     setBusy(true);
@@ -569,11 +595,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
       showFeedback(
         'success',
         editingPhoto
-          ? 'Campus gallery slide updated live.'
-          : 'Campus photo uploaded and published to the landing carousel.',
+          ? 'Slide galeri kampus berhasil diperbarui.'
+          : 'Foto kampus berhasil diunggah dan ditampilkan pada karusel beranda.',
       );
     } catch (err) {
-      showFeedback('error', err instanceof Error ? err.message : 'Failed to save gallery photograph.');
+      showFeedback('error', err instanceof Error ? err.message : 'Gagal menyimpan foto galeri.');
     } finally {
       setBusy(false);
     }
@@ -582,7 +608,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
   const submitBroadcast = async (e: React.FormEvent) => {
     e.preventDefault();
     if (notifForm.title.trim().length < 3 || notifForm.message.trim().length < 5) {
-      showFeedback('error', 'Enter a notification title (3+ chars) and message (5+ chars).');
+      showFeedback('error', 'Masukkan judul notifikasi (minimal 3 karakter) dan isi pesan (minimal 5 karakter).');
       return;
     }
     setBusy(true);
@@ -594,9 +620,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
         type: 'announcement',
         targetSection: 'news',
       });
-      showFeedback('success', 'Real-time notification broadcast to all connected portals.');
+      showFeedback('success', 'Notifikasi real-time berhasil disiarkan ke seluruh portal pengunjung.');
     } catch (err) {
-      showFeedback('error', err instanceof Error ? err.message : 'Failed to send notification.');
+      showFeedback('error', err instanceof Error ? err.message : 'Gagal mengirim notifikasi.');
     } finally {
       setBusy(false);
     }
@@ -607,15 +633,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
     setBusy(true);
     try {
       await saveSiteSettings(settingsForm);
-      showFeedback('success', 'University profile settings updated live.');
+      showFeedback('success', 'Pengaturan profil institusi berhasil diperbarui.');
     } catch (err) {
-      showFeedback('error', err instanceof Error ? err.message : 'Failed to save site profile.');
+      showFeedback('error', err instanceof Error ? err.message : 'Gagal menyimpan profil situs.');
     } finally {
       setBusy(false);
     }
   };
 
-  const currentTabLabel = NAV_ITEMS.find((n) => n.id === activeTab)?.label || 'Dashboard';
+  const currentTabLabel = NAV_ITEMS.find((n) => n.id === activeTab)?.label || 'Dasbor';
 
   return (
     <div className="min-h-screen bg-[#FAFBF9] flex flex-col lg:flex-row">
@@ -625,18 +651,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
           <div className="h-16 px-5 border-b border-[#E2E8E2] flex items-center gap-3">
             <img
               src={UNIVERSITY_MEDIA.logo}
-              alt="STAI Al-Furqan Crest"
+              alt="Logo STAI Al-Furqan Makassar"
               className="w-8 h-8 rounded-full object-cover border border-[#E2E8E2]"
             />
             <div className="min-w-0">
               <div className="font-editorial text-sm font-semibold text-[#0F1F18] truncate">
                 STAI Al-Furqan
               </div>
-              <div className="text-[11px] text-[#4A5D54]">University CMS</div>
+              <div className="text-[11px] text-[#4A5D54]">CMS Kampus</div>
             </div>
           </div>
 
-          <nav className="p-3 space-y-1" aria-label="CMS Sections">
+          <nav className="p-3 space-y-1" aria-label="Menu CMS">
             {NAV_ITEMS.map(({ id, label, Icon }) => {
               const active = activeTab === id;
               return (
@@ -664,10 +690,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
         <div className="p-4 border-t border-[#E2E8E2] space-y-3">
           <div className="text-xs">
             <div className="font-semibold text-[#0F1F18] truncate">
-              {user?.displayName || 'Demo Administrator'}
+              {user?.displayName || 'Administrator Demo'}
             </div>
             <div className="text-[#6B7D74] truncate">
-              {isCloudSynced && user?.email ? user.email : 'Demo Mode · Direct CMS Access'}
+              {isCloudSynced && user?.email ? user.email : 'Mode Demo · Akses CMS Langsung'}
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -683,7 +709,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               <button
                 type="button"
                 onClick={() => void signOutUser()}
-                aria-label="Sign out"
+                aria-label="Keluar akun"
                 className="inline-flex items-center justify-center px-3 py-2 text-xs font-medium text-[#4A5D54] border border-[#D4DDD6] hover:text-red-700 hover:border-red-200 rounded-lg cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -694,10 +720,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   type="button"
                   onClick={() => {
                     resetDemoData();
-                    showFeedback('success', 'Demo content restored to initial campus defaults.');
+                    showFeedback('success', 'Konten demo telah dikembalikan ke data awal kampus.');
                   }}
-                  title="Reset demo changes"
-                  aria-label="Reset demo changes"
+                  title="Atur ulang perubahan demo"
+                  aria-label="Atur ulang perubahan demo"
                   className="inline-flex items-center justify-center px-3 py-2 text-xs font-medium text-[#4A5D54] border border-[#D4DDD6] hover:text-[#0E5A36] hover:bg-[#F2F5F1] rounded-lg cursor-pointer"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
@@ -714,7 +740,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
         <header className="sticky top-0 z-30 bg-white border-b border-[#E2E8E2]">
           <div className="px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-xs sm:text-sm text-[#4A5D54] min-w-0">
-              <span className="hidden sm:inline">STAI Al-Furqan CMS</span>
+              <span className="hidden sm:inline">CMS STAI Al-Furqan</span>
               <span className="hidden sm:inline" aria-hidden="true">/</span>
               <span className="font-semibold text-[#0F1F18] truncate">{currentTabLabel}</span>
             </div>
@@ -728,7 +754,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#0E5A36] border border-[#0E5A36]/40 hover:bg-[#F2F5F1] rounded-lg whitespace-nowrap cursor-pointer"
                 >
                   <Database className="w-3.5 h-3.5" />
-                  {isSeeding ? 'Syncing DB...' : 'Initialize Firestore Seed'}
+                  {isSeeding ? 'Menyinkronkan...' : 'Inisialisasi Data Firestore'}
                 </button>
               )}
               <button
@@ -737,7 +763,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium text-[#0F1F18] border border-[#D4DDD6] hover:bg-[#F2F5F1] rounded-lg whitespace-nowrap cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                View Live Site
+                Lihat Situs Publik
               </button>
             </div>
           </div>
@@ -775,7 +801,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               type="button"
               onClick={() => setFeedbackBanner(null)}
               className="p-1 cursor-pointer"
-              aria-label="Dismiss message"
+              aria-label="Tutup pesan"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -792,10 +818,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="font-editorial text-2xl font-semibold text-[#0F1F18]">
-                    News, Articles &amp; Announcements
+                    Berita, Artikel &amp; Pengumuman
                   </h2>
                   <p className="text-xs text-[#4A5D54] mt-0.5">
-                    Create, publish, or schedule campus journalism and official announcements
+                    Buat, terbitkan, atau jadwalkan berita kampus, artikel ilmiah, dan pengumuman resmi
                   </p>
                 </div>
                 <button
@@ -804,23 +830,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg whitespace-nowrap cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
-                  New Publication
+                  Publikasi Baru
                 </button>
               </div>
 
               <div className="flex items-center gap-1 p-1 bg-white border border-[#D4DDD6] rounded-lg w-fit">
-                {(['all', 'news', 'article', 'announcement'] as const).map((cat) => (
+                {(
+                  [
+                    ['all', 'Semua'],
+                    ['news', 'Berita'],
+                    ['article', 'Artikel'],
+                    ['announcement', 'Pengumuman'],
+                  ] as const
+                ).map(([cat, label]) => (
                   <button
                     key={cat}
                     type="button"
                     onClick={() => setPostFilter(cat)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-md capitalize transition-colors cursor-pointer ${
+                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
                       postFilter === cat
                         ? 'bg-[#0E5A36] text-white'
                         : 'text-[#4A5D54] hover:text-[#0F1F18]'
                     }`}
                   >
-                    {cat === 'all' ? 'All Posts' : cat}
+                    {label}
                   </button>
                 ))}
               </div>
@@ -830,12 +863,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-[#E2E8E2] bg-[#FAFBF9] text-[11px] font-semibold text-[#4A5D54]">
-                        <th className="py-3 px-5">Title</th>
-                        <th className="py-3 px-4">Category</th>
+                        <th className="py-3 px-5">Judul</th>
+                        <th className="py-3 px-4">Kategori</th>
                         <th className="py-3 px-4">Status</th>
-                        <th className="py-3 px-4">Published</th>
-                        <th className="py-3 px-4 text-right">Views</th>
-                        <th className="py-3 px-5 text-right">Actions</th>
+                        <th className="py-3 px-4">Tanggal Terbit</th>
+                        <th className="py-3 px-4 text-right">Tayangan</th>
+                        <th className="py-3 px-5 text-right">Aksi</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#EDF1EE] text-xs">
@@ -845,7 +878,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                             <div className="truncate">{post.title}</div>
                             <div className="text-[11px] text-[#6B7D74] truncate">{post.authorName}</div>
                           </td>
-                          <td className="py-3.5 px-4 capitalize text-[#4A5D54]">{post.category}</td>
+                          <td className="py-3.5 px-4 text-[#4A5D54] whitespace-nowrap">
+                            {postCategoryLabel(post.category)}
+                          </td>
                           <td className="py-3.5 px-4">
                             <span
                               className={
@@ -854,7 +889,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                                   : 'text-amber-700 font-semibold'
                               }
                             >
-                              {post.status === 'published' ? 'Published' : 'Draft'}
+                              {post.status === 'published' ? 'Terbit' : 'Draf'}
                             </span>
                           </td>
                           <td className="py-3.5 px-4 font-mono text-[#6B7D74] tabular-nums whitespace-nowrap">
@@ -871,7 +906,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                                 className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#0F1F18] border border-[#D4DDD6] hover:bg-[#F2F5F1] rounded-md cursor-pointer"
                               >
                                 <Edit3 className="w-3.5 h-3.5" />
-                                Edit
+                                Sunting
                               </button>
                               {confirmDeleteId === post.id ? (
                                 <button
@@ -879,17 +914,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                                   onClick={async () => {
                                     await deletePost(post.id);
                                     setConfirmDeleteId(null);
-                                    showFeedback('success', 'Publication removed.');
+                                    showFeedback('success', 'Publikasi telah dihapus.');
                                   }}
                                   className="px-2.5 py-1 text-xs font-semibold text-white bg-red-700 hover:bg-red-800 rounded-md cursor-pointer"
                                 >
-                                  Confirm
+                                  Konfirmasi
                                 </button>
                               ) : (
                                 <button
                                   type="button"
                                   onClick={() => setConfirmDeleteId(post.id)}
-                                  aria-label={`Delete ${post.title}`}
+                                  aria-label={`Hapus ${post.title}`}
                                   className="p-1.5 text-[#6B7D74] hover:text-red-700 rounded-md cursor-pointer"
                                 >
                                   <Trash2 className="w-4 h-4" />
@@ -912,10 +947,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="font-editorial text-2xl font-semibold text-[#0F1F18]">
-                    Academic Program Listings
+                    Daftar Program Studi
                   </h2>
                   <p className="text-xs text-[#4A5D54] mt-0.5">
-                    Manage S1 undergraduate and S2 postgraduate study programs displayed on the portal
+                    Kelola program studi Sarjana (S1) dan Pascasarjana (S2) yang tampil di portal publik
                   </p>
                 </div>
                 <button
@@ -924,7 +959,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg whitespace-nowrap cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
-                  Add Program
+                  Tambah Program Studi
                 </button>
               </div>
 
@@ -933,12 +968,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-[#E2E8E2] bg-[#FAFBF9] text-[11px] font-semibold text-[#4A5D54]">
-                        <th className="py-3 px-5">Code</th>
-                        <th className="py-3 px-4">Program Name</th>
-                        <th className="py-3 px-4">Faculty</th>
-                        <th className="py-3 px-4">Accreditation</th>
-                        <th className="py-3 px-4 text-right">Credits</th>
-                        <th className="py-3 px-5 text-right">Actions</th>
+                        <th className="py-3 px-5">Kode</th>
+                        <th className="py-3 px-4">Nama Program Studi</th>
+                        <th className="py-3 px-4">Fakultas</th>
+                        <th className="py-3 px-4">Akreditasi</th>
+                        <th className="py-3 px-4 text-right">SKS</th>
+                        <th className="py-3 px-5 text-right">Aksi</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#EDF1EE] text-xs">
@@ -950,7 +985,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                           <td className="py-3.5 px-4 font-medium text-[#0F1F18]">
                             {prog.name}
                             {!prog.active && (
-                              <span className="ml-2 text-[11px] text-amber-700">(Hidden)</span>
+                              <span className="ml-2 text-[11px] text-amber-700">(Disembunyikan)</span>
                             )}
                           </td>
                           <td className="py-3.5 px-4 text-[#4A5D54]">{prog.faculty}</td>
@@ -966,7 +1001,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                                 className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#0F1F18] border border-[#D4DDD6] hover:bg-[#F2F5F1] rounded-md cursor-pointer"
                               >
                                 <Edit3 className="w-3.5 h-3.5" />
-                                Edit
+                                Sunting
                               </button>
                               {confirmDeleteId === prog.id ? (
                                 <button
@@ -974,17 +1009,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                                   onClick={async () => {
                                     await deleteProgram(prog.id);
                                     setConfirmDeleteId(null);
-                                    showFeedback('success', 'Program removed.');
+                                    showFeedback('success', 'Program studi telah dihapus.');
                                   }}
                                   className="px-2.5 py-1 text-xs font-semibold text-white bg-red-700 rounded-md cursor-pointer"
                                 >
-                                  Confirm
+                                  Konfirmasi
                                 </button>
                               ) : (
                                 <button
                                   type="button"
                                   onClick={() => setConfirmDeleteId(prog.id)}
-                                  aria-label={`Delete ${prog.name}`}
+                                  aria-label={`Hapus ${prog.name}`}
                                   className="p-1.5 text-[#6B7D74] hover:text-red-700 rounded-md cursor-pointer"
                                 >
                                   <Trash2 className="w-4 h-4" />
@@ -1007,10 +1042,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="font-editorial text-2xl font-semibold text-[#0F1F18]">
-                    Campus Agenda &amp; Calendar
+                    Agenda &amp; Kalender Kampus
                   </h2>
                   <p className="text-xs text-[#4A5D54] mt-0.5">
-                    Schedule academic deadlines, symposiums, MTQ events, and open house dates
+                    Jadwalkan tenggat akademik, simposium ilmiah, MTQ mahasiswa, dan kegiatan kampus lainnya
                   </p>
                 </div>
                 <button
@@ -1019,7 +1054,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg whitespace-nowrap cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
-                  Add Event
+                  Tambah Agenda
                 </button>
               </div>
 
@@ -1031,7 +1066,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   >
                     <div className="min-w-0">
                       <div className="text-xs font-mono text-[#0E5A36] tabular-nums mb-1">
-                        {evt.eventDate} · {evt.timeRange} · {evt.status}
+                        {evt.eventDate} · {evt.timeRange} · {agendaStatusLabel(evt.status)}
                       </div>
                       <div className="text-sm font-semibold text-[#0F1F18]">{evt.title}</div>
                       <div className="text-xs text-[#4A5D54] mt-0.5">
@@ -1045,7 +1080,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                         className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-[#0F1F18] border border-[#D4DDD6] hover:bg-[#F2F5F1] rounded-md cursor-pointer"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
-                        Edit
+                        Sunting
                       </button>
                       {confirmDeleteId === evt.id ? (
                         <button
@@ -1053,17 +1088,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                           onClick={async () => {
                             await deleteAgenda(evt.id);
                             setConfirmDeleteId(null);
-                            showFeedback('success', 'Agenda event deleted.');
+                            showFeedback('success', 'Agenda kampus telah dihapus.');
                           }}
                           className="px-3 py-1.5 text-xs font-semibold text-white bg-red-700 rounded-md cursor-pointer"
                         >
-                          Confirm
+                          Konfirmasi
                         </button>
                       ) : (
                         <button
                           type="button"
                           onClick={() => setConfirmDeleteId(evt.id)}
-                          aria-label={`Delete ${evt.title}`}
+                          aria-label={`Hapus ${evt.title}`}
                           className="p-1.5 text-[#6B7D74] hover:text-red-700 rounded-md cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1082,10 +1117,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="font-editorial text-2xl font-semibold text-[#0F1F18]">
-                    Campus Life Photo Gallery
+                    Galeri Foto Kehidupan Kampus
                   </h2>
                   <p className="text-xs text-[#4A5D54] mt-0.5">
-                    Upload campus photographs, adjust carousel sequence, and manage slides displayed on the landing page
+                    Unggah dokumentasi kampus, atur urutan karusel, dan kelola slide yang tampil di halaman utama
                   </p>
                 </div>
                 <button
@@ -1094,14 +1129,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg whitespace-nowrap cursor-pointer"
                 >
                   <Upload className="w-4 h-4" />
-                  Upload Campus Photo
+                  Unggah Foto Kampus
                 </button>
               </div>
 
               {orderedGalleryPhotos.length === 0 ? (
                 <div className="bg-white border border-[#E2E8E2] rounded-xl p-10 text-center">
                   <p className="text-sm text-[#4A5D54]">
-                    No photographs in the campus gallery yet. Upload your first slide to populate the carousel.
+                    Belum ada foto di galeri kampus. Unggah slide pertama Anda untuk mengisi karusel beranda.
                   </p>
                 </div>
               ) : (
@@ -1124,15 +1159,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                           </div>
                         </div>
                         <div className="p-4">
-                          <div className="text-xs text-[#4A5D54] mb-1 capitalize">
+                          <div className="text-xs text-[#4A5D54] mb-1">
                             <span className="font-semibold text-[#0E5A36]">
-                              {photo.category.replace('-', ' ')}
+                              {galleryCategoryLabel(photo.category)}
                             </span>
                             <span aria-hidden="true"> · </span>
                             <span>{photo.photographer}</span>
                             <span aria-hidden="true"> · </span>
                             <span className={photo.active ? 'text-[#0E5A36] font-medium' : 'text-amber-700 font-medium'}>
-                              {photo.active ? 'Visible' : 'Hidden'}
+                              {photo.active ? 'Tampil' : 'Disembunyikan'}
                             </span>
                           </div>
                           <h3 className="text-sm font-semibold text-[#0F1F18] leading-snug">
@@ -1150,7 +1185,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                             type="button"
                             disabled={idx === 0}
                             onClick={() => void reorderGalleryPhoto(photo.id, 'up')}
-                            aria-label={`Move ${photo.title} earlier`}
+                            aria-label={`Pindahkan ${photo.title} ke atas`}
                             className="p-1.5 text-[#4A5D54] hover:text-[#0F1F18] hover:bg-white border border-transparent hover:border-[#D4DDD6] disabled:opacity-35 rounded-md cursor-pointer"
                           >
                             <ArrowUp className="w-3.5 h-3.5" />
@@ -1159,7 +1194,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                             type="button"
                             disabled={idx === orderedGalleryPhotos.length - 1}
                             onClick={() => void reorderGalleryPhoto(photo.id, 'down')}
-                            aria-label={`Move ${photo.title} later`}
+                            aria-label={`Pindahkan ${photo.title} ke bawah`}
                             className="p-1.5 text-[#4A5D54] hover:text-[#0F1F18] hover:bg-white border border-transparent hover:border-[#D4DDD6] disabled:opacity-35 rounded-md cursor-pointer"
                           >
                             <ArrowDown className="w-3.5 h-3.5" />
@@ -1167,18 +1202,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                           <button
                             type="button"
                             onClick={() => void toggleGalleryPhotoActive(photo)}
-                            aria-label={photo.active ? `Hide ${photo.title}` : `Show ${photo.title}`}
+                            aria-label={photo.active ? `Sembunyikan ${photo.title}` : `Tampilkan ${photo.title}`}
                             className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-[#4A5D54] hover:text-[#0F1F18] hover:bg-white border border-transparent hover:border-[#D4DDD6] rounded-md cursor-pointer"
                           >
                             {photo.active ? (
                               <>
                                 <EyeOff className="w-3.5 h-3.5" />
-                                Hide
+                                Sembunyikan
                               </>
                             ) : (
                               <>
                                 <Eye className="w-3.5 h-3.5" />
-                                Show
+                                Tampilkan
                               </>
                             )}
                           </button>
@@ -1191,7 +1226,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                             className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#0F1F18] border border-[#D4DDD6] bg-white hover:bg-[#F2F5F1] rounded-md cursor-pointer"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
-                            Edit
+                            Sunting
                           </button>
                           {confirmDeleteId === photo.id ? (
                             <button
@@ -1199,17 +1234,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                               onClick={async () => {
                                 await deleteGalleryPhoto(photo.id);
                                 setConfirmDeleteId(null);
-                                showFeedback('success', 'Photograph removed from gallery.');
+                                showFeedback('success', 'Foto telah dihapus dari galeri.');
                               }}
                               className="px-2.5 py-1 text-xs font-semibold text-white bg-red-700 hover:bg-red-800 rounded-md cursor-pointer"
                             >
-                              Confirm
+                              Konfirmasi
                             </button>
                           ) : (
                             <button
                               type="button"
                               onClick={() => setConfirmDeleteId(photo.id)}
-                              aria-label={`Delete ${photo.title}`}
+                              aria-label={`Hapus ${photo.title}`}
                               className="p-1.5 text-[#6B7D74] hover:text-red-700 rounded-md cursor-pointer"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -1230,10 +1265,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="font-editorial text-2xl font-semibold text-[#0F1F18]">
-                    Alumni Testimonials
+                    Testimoni Alumni
                   </h2>
                   <p className="text-xs text-[#4A5D54] mt-0.5">
-                    Curate verified graduate career stories featured on the university landing page
+                    Kelola kisah kiprah lulusan terverifikasi yang ditampilkan di beranda kampus
                   </p>
                 </div>
                 <button
@@ -1242,7 +1277,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg whitespace-nowrap cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
-                  Add Testimonial
+                  Tambah Testimoni
                 </button>
               </div>
 
@@ -1254,7 +1289,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   >
                     <div>
                       <div className="text-xs text-[#0E5A36] font-medium mb-1">
-                        {item.program} · Class of {item.graduationYear}
+                        {item.program} · Angkatan {item.graduationYear}
                       </div>
                       <div className="text-base font-semibold text-[#0F1F18]">{item.name}</div>
                       <div className="text-xs text-[#6B7D74] mb-3">
@@ -1266,7 +1301,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                     </div>
                     <div className="pt-3 border-t border-[#EDF1EE] flex items-center justify-between">
                       <span className="text-[11px] text-[#6B7D74]">
-                        {item.active ? 'Visible on portal' : 'Hidden'}
+                        {item.active ? 'Tampil di portal' : 'Disembunyikan'}
                       </span>
                       <div className="flex items-center gap-2">
                         <button
@@ -1275,7 +1310,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                           className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#0F1F18] border border-[#D4DDD6] hover:bg-[#F2F5F1] rounded-md cursor-pointer"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
-                          Edit
+                          Sunting
                         </button>
                         {confirmDeleteId === item.id ? (
                           <button
@@ -1283,17 +1318,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                             onClick={async () => {
                               await deleteTestimonial(item.id);
                               setConfirmDeleteId(null);
-                              showFeedback('success', 'Testimonial deleted.');
+                              showFeedback('success', 'Testimoni alumni telah dihapus.');
                             }}
                             className="px-2.5 py-1 text-xs font-semibold text-white bg-red-700 rounded-md cursor-pointer"
                           >
-                            Confirm
+                            Konfirmasi
                           </button>
                         ) : (
                           <button
                             type="button"
                             onClick={() => setConfirmDeleteId(item.id)}
-                            aria-label={`Delete ${item.name}`}
+                            aria-label={`Hapus ${item.name}`}
                             className="p-1.5 text-[#6B7D74] hover:text-red-700 rounded-md cursor-pointer"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -1312,10 +1347,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
             <div className="space-y-6">
               <div>
                 <h2 className="font-editorial text-2xl font-semibold text-[#0F1F18]">
-                  Real-Time Campus Notifications
+                  Notifikasi Kampus Real-Time
                 </h2>
                 <p className="text-xs text-[#4A5D54] mt-0.5">
-                  Send live alerts that appear instantaneously in connected visitors&apos; notification drawers
+                  Kirim pengumuman langsung yang muncul seketika di panel notifikasi pengunjung portal
                 </p>
               </div>
 
@@ -1325,11 +1360,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   className="lg:col-span-5 bg-white border border-[#E2E8E2] rounded-xl p-6 space-y-4 h-fit"
                 >
                   <h3 className="text-base font-semibold text-[#0F1F18]">
-                    Compose Live Broadcast
+                    Buat Siaran Notifikasi
                   </h3>
                   <div>
                     <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                      Alert Title
+                      Judul Notifikasi
                     </label>
                     <input
                       type="text"
@@ -1337,13 +1372,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                       maxLength={140}
                       value={notifForm.title}
                       onChange={(e) => setNotifForm({ ...notifForm, title: e.target.value })}
-                      placeholder="e.g. Scholarship Verification Extended"
+                      placeholder="Contoh: Perpanjangan Verifikasi Beasiswa"
                       className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg focus:outline-none focus:border-[#0E5A36]"
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                      Message Body
+                      Isi Pesan
                     </label>
                     <textarea
                       required
@@ -1351,14 +1386,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                       maxLength={400}
                       value={notifForm.message}
                       onChange={(e) => setNotifForm({ ...notifForm, message: e.target.value })}
-                      placeholder="Provide clear instructions, deadline, or venue details..."
+                      placeholder="Tuliskan informasi penting, batas waktu, atau lokasi kegiatan..."
                       className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg focus:outline-none focus:border-[#0E5A36]"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                        Alert Category
+                        Kategori Info
                       </label>
                       <select
                         value={notifForm.type}
@@ -1370,15 +1405,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                         }
                         className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg bg-white"
                       >
-                        <option value="announcement">Announcement</option>
-                        <option value="urgent">Urgent Notice</option>
+                        <option value="announcement">Pengumuman</option>
+                        <option value="urgent">Info Penting</option>
                         <option value="agenda">Agenda</option>
-                        <option value="news">Campus News</option>
+                        <option value="news">Berita Kampus</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                        Target Section
+                        Bagian Tujuan
                       </label>
                       <select
                         value={notifForm.targetSection}
@@ -1387,10 +1422,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                         }
                         className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg bg-white"
                       >
-                        <option value="news">News &amp; Notices</option>
-                        <option value="agenda">Campus Agenda</option>
-                        <option value="programs">Academic Programs</option>
-                        <option value="campus-map">Campus Map</option>
+                        <option value="news">Berita &amp; Pengumuman</option>
+                        <option value="agenda">Agenda Kampus</option>
+                        <option value="programs">Program Studi</option>
+                        <option value="campus-map">Peta Kampus</option>
                       </select>
                     </div>
                   </div>
@@ -1400,14 +1435,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                     className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] disabled:opacity-50 rounded-lg cursor-pointer"
                   >
                     <Send className="w-3.5 h-3.5" />
-                    {busy ? 'Sending...' : 'Broadcast Live Notification'}
+                    {busy ? 'Mengirim...' : 'Siarkan Notifikasi Sekarang'}
                   </button>
                 </form>
 
                 <div className="lg:col-span-7 bg-white border border-[#E2E8E2] rounded-xl overflow-hidden">
                   <div className="px-6 py-4 border-b border-[#E2E8E2]">
                     <h3 className="text-base font-semibold text-[#0F1F18]">
-                      Active &amp; Archived Broadcasts ({notifications.length})
+                      Daftar Siaran Aktif &amp; Arsip ({notifications.length})
                     </h3>
                   </div>
                   <div className="divide-y divide-[#EDF1EE]">
@@ -1417,10 +1452,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                         className="px-6 py-4 flex items-start justify-between gap-4"
                       >
                         <div className="min-w-0">
-                          <div className="text-xs text-[#4A5D54] mb-0.5 capitalize">
-                            <span className="font-semibold text-[#0E5A36]">{notif.type}</span>
+                          <div className="text-xs text-[#4A5D54] mb-0.5">
+                            <span className="font-semibold text-[#0E5A36]">
+                              {notifTypeLabel(notif.type)}
+                            </span>
                             <span aria-hidden="true"> · </span>
-                            <span>{notif.active ? 'Active' : 'Paused'}</span>
+                            <span>{notif.active ? 'Aktif' : 'Dijeda'}</span>
                           </div>
                           <div className="text-sm font-semibold text-[#0F1F18]">{notif.title}</div>
                           <p className="text-xs text-[#4A5D54] mt-1">{notif.message}</p>
@@ -1431,12 +1468,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                             onClick={() => void toggleNotificationActive(notif)}
                             className="px-2.5 py-1 text-xs font-medium text-[#0F1F18] border border-[#D4DDD6] hover:bg-[#F2F5F1] rounded-md cursor-pointer"
                           >
-                            {notif.active ? 'Pause' : 'Activate'}
+                            {notif.active ? 'Jeda' : 'Aktifkan'}
                           </button>
                           <button
                             type="button"
                             onClick={() => void deleteNotification(notif.id)}
-                            aria-label={`Delete ${notif.title}`}
+                            aria-label={`Hapus ${notif.title}`}
                             className="p-1.5 text-[#6B7D74] hover:text-red-700 rounded-md cursor-pointer"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -1456,10 +1493,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <h2 className="font-editorial text-2xl font-semibold text-[#0F1F18]">
-                    Site Identity &amp; Profile Configuration
+                    Pengaturan Identitas &amp; Profil Situs
                   </h2>
                   <p className="text-xs text-[#4A5D54] mt-0.5">
-                    Changes update the public university homepage immediately
+                    Perubahan langsung memperbarui beranda portal publik STAI Al-Furqan Makassar
                   </p>
                 </div>
                 <button
@@ -1468,16 +1505,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] disabled:opacity-50 rounded-lg whitespace-nowrap cursor-pointer"
                 >
                   <Check className="w-4 h-4" />
-                  {busy ? 'Saving...' : 'Save Changes'}
+                  {busy ? 'Menyimpan...' : 'Simpan Perubahan'}
                 </button>
               </div>
 
               <div className="bg-white border border-[#E2E8E2] rounded-xl p-6 space-y-4">
-                <h3 className="text-sm font-semibold text-[#0F1F18]">Hero &amp; Admissions</h3>
+                <h3 className="text-sm font-semibold text-[#0F1F18]">Hero &amp; Penerimaan Mahasiswa Baru</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                      Institution Name
+                      Nama Institusi
                     </label>
                     <input
                       type="text"
@@ -1492,7 +1529,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                      Admissions Banner Label
+                      Label Spanduk PMB
                     </label>
                     <input
                       type="text"
@@ -1509,7 +1546,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
 
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    Hero Headline
+                    Judul Utama Beranda
                   </label>
                   <input
                     type="text"
@@ -1525,7 +1562,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
 
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    Hero Subtitle
+                    Subjudul Beranda
                   </label>
                   <textarea
                     rows={3}
@@ -1548,16 +1585,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                     }
                     className="rounded border-[#D4DDD6] accent-[#0E5A36]"
                   />
-                  Display active admissions announcement line in Hero section
+                  Tampilkan baris informasi pendaftaran PMB aktif pada bagian Hero
                 </label>
               </div>
 
               <div className="bg-white border border-[#E2E8E2] rounded-xl p-6 space-y-4">
                 <h3 className="text-sm font-semibold text-[#0F1F18]">
-                  Vision, Mission &amp; Leadership
+                  Visi, Misi &amp; Pimpinan Institusi
                 </h3>
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Vision</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Visi</label>
                   <textarea
                     rows={2}
                     required
@@ -1568,7 +1605,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Mission</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Misi</label>
                   <textarea
                     rows={3}
                     required
@@ -1581,7 +1618,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                      Chairman / Rector Name
+                      Nama Ketua / Pimpinan
                     </label>
                     <input
                       type="text"
@@ -1596,7 +1633,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                      Leadership Title
+                      Jabatan Pimpinan
                     </label>
                     <input
                       type="text"
@@ -1612,7 +1649,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    Rector&apos;s Statement
+                    Sambutan Ketua
                   </label>
                   <textarea
                     rows={3}
@@ -1628,10 +1665,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               </div>
 
               <div className="bg-white border border-[#E2E8E2] rounded-xl p-6 space-y-4">
-                <h3 className="text-sm font-semibold text-[#0F1F18]">Contact Information</h3>
+                <h3 className="text-sm font-semibold text-[#0F1F18]">Informasi Kontak</h3>
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    Campus Address
+                    Alamat Kampus
                   </label>
                   <input
                     type="text"
@@ -1644,7 +1681,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-[#0F1F18] mb-1">Phone</label>
+                    <label className="block text-xs font-medium text-[#0F1F18] mb-1">Telepon</label>
                     <input
                       type="text"
                       required
@@ -1671,17 +1708,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               <div className="bg-white border border-[#E2E8E2] rounded-xl p-6 space-y-4">
                 <div>
                   <h3 className="text-sm font-semibold text-[#0F1F18]">
-                    Official Social Media Profiles
+                    Profil Media Sosial Resmi
                   </h3>
                   <p className="text-xs text-[#4A5D54] mt-0.5">
-                    Configure the university&apos;s official footer links. Leave a field blank to hide
-                    that platform from the public footer.
+                    Atur tautan kanal media sosial resmi di footer situs. Kosongkan kolom untuk
+                    menyembunyikan platform tersebut dari footer publik.
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                      Instagram URL
+                      URL Instagram
                     </label>
                     <input
                       type="url"
@@ -1696,7 +1733,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                      Facebook URL
+                      URL Facebook
                     </label>
                     <input
                       type="url"
@@ -1711,7 +1748,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                      Twitter / X URL
+                      URL Twitter / X
                     </label>
                     <input
                       type="url"
@@ -1726,7 +1763,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                      YouTube URL
+                      URL YouTube
                     </label>
                     <input
                       type="url"
@@ -1756,11 +1793,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
           >
             <div className="px-6 py-4 border-b border-[#E2E8E2] flex items-center justify-between">
               <h3 className="font-editorial text-xl font-semibold text-[#0F1F18]">
-                {editingPost ? 'Edit Publication' : 'New News / Article / Announcement'}
+                {editingPost ? 'Sunting Publikasi' : 'Berita / Artikel / Pengumuman Baru'}
               </h3>
               <button
                 type="button"
                 onClick={() => setPostModalOpen(false)}
+                aria-label="Tutup editor publikasi"
                 className="p-1.5 text-[#4A5D54] hover:text-[#0F1F18] cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -1768,7 +1806,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
             </div>
             <div className="p-6 overflow-y-auto space-y-4">
               <div>
-                <label className="block text-xs font-medium text-[#0F1F18] mb-1">Title</label>
+                <label className="block text-xs font-medium text-[#0F1F18] mb-1">Judul</label>
                 <input
                   type="text"
                   required
@@ -1782,7 +1820,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Category</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Kategori</label>
                   <select
                     value={postForm.category}
                     onChange={(e) =>
@@ -1790,9 +1828,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                     }
                     className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg bg-white"
                   >
-                    <option value="news">News</option>
-                    <option value="article">Scholarly Article</option>
-                    <option value="announcement">Announcement</option>
+                    <option value="news">Berita Kampus</option>
+                    <option value="article">Artikel Ilmiah</option>
+                    <option value="announcement">Pengumuman</option>
                   </select>
                 </div>
                 <div>
@@ -1804,12 +1842,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                     }
                     className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg bg-white"
                   >
-                    <option value="published">Published</option>
-                    <option value="draft">Draft</option>
+                    <option value="published">Terbit</option>
+                    <option value="draft">Draf</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Priority</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Prioritas</label>
                   <select
                     value={postForm.priority}
                     onChange={(e) =>
@@ -1818,15 +1856,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                     className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg bg-white"
                   >
                     <option value="normal">Normal</option>
-                    <option value="important">Important</option>
-                    <option value="urgent">Urgent Notice</option>
+                    <option value="important">Penting</option>
+                    <option value="urgent">Mendesak</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Author</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Penulis</label>
                   <input
                     type="text"
                     required
@@ -1837,7 +1875,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    Publish Date
+                    Tanggal Terbit
                   </label>
                   <input
                     type="date"
@@ -1851,7 +1889,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
 
               <div>
                 <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                  Cover Photography
+                  Foto Sampul
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
                   {COVER_IMAGE_PRESETS.map((preset) => (
@@ -1873,7 +1911,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
 
               <div>
                 <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                  Short Excerpt (10–400 characters)
+                  Ringkasan Singkat (10–400 karakter)
                 </label>
                 <textarea
                   rows={2}
@@ -1888,7 +1926,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
 
               <div>
                 <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                  Article Body (separate paragraphs with a blank line)
+                  Isi Publikasi (pisahkan paragraf dengan baris kosong)
                 </label>
                 <textarea
                   rows={6}
@@ -1909,7 +1947,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                     onChange={(e) => setPostForm({ ...postForm, alsoNotify: e.target.checked })}
                     className="accent-[#0E5A36]"
                   />
-                  Push real-time campus notification upon publishing
+                  Kirim notifikasi kampus real-time saat diterbitkan
                 </label>
               )}
             </div>
@@ -1919,14 +1957,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 onClick={() => setPostModalOpen(false)}
                 className="px-4 py-2 text-xs font-medium text-[#4A5D54] cursor-pointer"
               >
-                Cancel
+                Batal
               </button>
               <button
                 type="submit"
                 disabled={busy}
                 className="px-5 py-2 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] disabled:opacity-50 rounded-lg cursor-pointer"
               >
-                {busy ? 'Saving...' : 'Save Publication'}
+                {busy ? 'Menyimpan...' : 'Simpan Publikasi'}
               </button>
             </div>
           </form>
@@ -1943,11 +1981,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
           >
             <div className="px-6 py-4 border-b border-[#E2E8E2] flex items-center justify-between">
               <h3 className="font-editorial text-xl font-semibold text-[#0F1F18]">
-                {editingProgram ? 'Edit Academic Program' : 'Add Academic Program'}
+                {editingProgram ? 'Sunting Program Studi' : 'Tambah Program Studi'}
               </h3>
               <button
                 type="button"
                 onClick={() => setProgramModalOpen(false)}
+                aria-label="Tutup editor program studi"
                 className="p-1.5 text-[#4A5D54] cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -1956,7 +1995,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
             <div className="p-6 overflow-y-auto space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Code</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Kode</label>
                   <input
                     type="text"
                     required
@@ -1967,7 +2006,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Degree</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Jenjang</label>
                   <select
                     value={programForm.degree}
                     onChange={(e) =>
@@ -1975,13 +2014,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                     }
                     className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg bg-white"
                   >
-                    <option value="S1">Undergraduate (S1)</option>
-                    <option value="S2">Postgraduate (S2)</option>
+                    <option value="S1">Sarjana (S1)</option>
+                    <option value="S2">Pascasarjana (S2)</option>
                   </select>
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#0F1F18] mb-1">Program Name</label>
+                <label className="block text-xs font-medium text-[#0F1F18] mb-1">Nama Program Studi</label>
                 <input
                   type="text"
                   required
@@ -1992,7 +2031,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Faculty</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Fakultas</label>
                   <input
                     type="text"
                     required
@@ -2003,7 +2042,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    Accreditation
+                    Akreditasi
                   </label>
                   <input
                     type="text"
@@ -2017,7 +2056,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    Credits (SKS)
+                    Beban SKS
                   </label>
                   <input
                     type="number"
@@ -2033,7 +2072,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#0F1F18] mb-1">Duration</label>
+                <label className="block text-xs font-medium text-[#0F1F18] mb-1">Masa Studi</label>
                 <input
                   type="text"
                   required
@@ -2043,7 +2082,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#0F1F18] mb-1">Summary</label>
+                <label className="block text-xs font-medium text-[#0F1F18] mb-1">Ringkasan Akademik</label>
                 <textarea
                   rows={3}
                   required
@@ -2054,7 +2093,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               </div>
               <div>
                 <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                  Career Outcomes
+                  Prospek Karier Lulusan
                 </label>
                 <textarea
                   rows={2}
@@ -2073,7 +2112,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   onChange={(e) => setProgramForm({ ...programForm, active: e.target.checked })}
                   className="accent-[#0E5A36]"
                 />
-                Visible on public portal
+                Tampilkan di portal publik
               </label>
             </div>
             <div className="px-6 py-4 border-t border-[#E2E8E2] bg-[#FAFBF9] flex justify-end gap-2">
@@ -2082,14 +2121,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 onClick={() => setProgramModalOpen(false)}
                 className="px-4 py-2 text-xs font-medium text-[#4A5D54] cursor-pointer"
               >
-                Cancel
+                Batal
               </button>
               <button
                 type="submit"
                 disabled={busy}
                 className="px-5 py-2 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg cursor-pointer"
               >
-                {busy ? 'Saving...' : 'Save Program'}
+                {busy ? 'Menyimpan...' : 'Simpan Program'}
               </button>
             </div>
           </form>
@@ -2106,11 +2145,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
           >
             <div className="px-6 py-4 border-b border-[#E2E8E2] flex items-center justify-between">
               <h3 className="font-editorial text-xl font-semibold text-[#0F1F18]">
-                {editingAgenda ? 'Edit Agenda Event' : 'Add Campus Agenda Event'}
+                {editingAgenda ? 'Sunting Agenda Kampus' : 'Tambah Agenda Kampus'}
               </h3>
               <button
                 type="button"
                 onClick={() => setAgendaModalOpen(false)}
+                aria-label="Tutup editor agenda"
                 className="p-1.5 text-[#4A5D54] cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -2118,7 +2158,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
             </div>
             <div className="p-6 overflow-y-auto space-y-4">
               <div>
-                <label className="block text-xs font-medium text-[#0F1F18] mb-1">Event Title</label>
+                <label className="block text-xs font-medium text-[#0F1F18] mb-1">Judul Kegiatan</label>
                 <input
                   type="text"
                   required
@@ -2129,7 +2169,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Date</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Tanggal</label>
                   <input
                     type="date"
                     required
@@ -2139,7 +2179,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Time Range</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Waktu</label>
                   <input
                     type="text"
                     required
@@ -2151,7 +2191,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Location</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Lokasi</label>
                   <input
                     type="text"
                     required
@@ -2161,7 +2201,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Organizer</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Penyelenggara</label>
                   <input
                     type="text"
                     required
@@ -2173,7 +2213,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Category</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Kategori</label>
                   <select
                     value={agendaForm.category}
                     onChange={(e) =>
@@ -2181,10 +2221,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                     }
                     className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg bg-white"
                   >
-                    <option value="academic">Academic</option>
-                    <option value="admissions">Admissions</option>
-                    <option value="seminar">Seminar</option>
-                    <option value="student-life">Student Life</option>
+                    <option value="academic">Akademik</option>
+                    <option value="admissions">Penerimaan (PMB)</option>
+                    <option value="seminar">Seminar &amp; Simposium</option>
+                    <option value="student-life">Kemahasiswaan</option>
                   </select>
                 </div>
                 <div>
@@ -2196,14 +2236,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                     }
                     className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg bg-white"
                   >
-                    <option value="upcoming">Upcoming</option>
-                    <option value="ongoing">Ongoing</option>
-                    <option value="completed">Completed</option>
+                    <option value="upcoming">Akan Datang</option>
+                    <option value="ongoing">Berlangsung</option>
+                    <option value="completed">Selesai</option>
                   </select>
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[#0F1F18] mb-1">Description</label>
+                <label className="block text-xs font-medium text-[#0F1F18] mb-1">Deskripsi</label>
                 <textarea
                   rows={3}
                   required
@@ -2220,7 +2260,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                     onChange={(e) => setAgendaForm({ ...agendaForm, alsoNotify: e.target.checked })}
                     className="accent-[#0E5A36]"
                   />
-                  Broadcast real-time agenda notification
+                  Siarkan notifikasi agenda secara real-time
                 </label>
               )}
             </div>
@@ -2230,14 +2270,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 onClick={() => setAgendaModalOpen(false)}
                 className="px-4 py-2 text-xs font-medium text-[#4A5D54] cursor-pointer"
               >
-                Cancel
+                Batal
               </button>
               <button
                 type="submit"
                 disabled={busy}
                 className="px-5 py-2 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg cursor-pointer"
               >
-                {busy ? 'Saving...' : 'Save Event'}
+                {busy ? 'Menyimpan...' : 'Simpan Agenda'}
               </button>
             </div>
           </form>
@@ -2254,11 +2294,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
           >
             <div className="px-6 py-4 border-b border-[#E2E8E2] flex items-center justify-between">
               <h3 className="font-editorial text-xl font-semibold text-[#0F1F18]">
-                {editingAlumni ? 'Edit Alumni Testimonial' : 'Add Alumni Testimonial'}
+                {editingAlumni ? 'Sunting Testimoni Alumni' : 'Tambah Testimoni Alumni'}
               </h3>
               <button
                 type="button"
                 onClick={() => setAlumniModalOpen(false)}
+                aria-label="Tutup editor testimoni"
                 className="p-1.5 text-[#4A5D54] cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -2267,7 +2308,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
             <div className="p-6 overflow-y-auto space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Full Name</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Nama Lengkap</label>
                   <input
                     type="text"
                     required
@@ -2278,7 +2319,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    Graduation Year
+                    Tahun Lulus
                   </label>
                   <input
                     type="number"
@@ -2295,7 +2336,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               </div>
               <div>
                 <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                  Degree Program
+                  Program Studi
                 </label>
                 <input
                   type="text"
@@ -2307,7 +2348,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Role</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Jabatan / Profesi</label>
                   <input
                     type="text"
                     required
@@ -2318,7 +2359,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    Organization
+                    Instansi / Lembaga
                   </label>
                   <input
                     type="text"
@@ -2331,7 +2372,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               </div>
               <div>
                 <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                  Testimonial Quote
+                  Kutipan Testimoni
                 </label>
                 <textarea
                   rows={4}
@@ -2348,14 +2389,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 onClick={() => setAlumniModalOpen(false)}
                 className="px-4 py-2 text-xs font-medium text-[#4A5D54] cursor-pointer"
               >
-                Cancel
+                Batal
               </button>
               <button
                 type="submit"
                 disabled={busy}
                 className="px-5 py-2 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] rounded-lg cursor-pointer"
               >
-                {busy ? 'Saving...' : 'Save Testimonial'}
+                {busy ? 'Menyimpan...' : 'Simpan Testimoni'}
               </button>
             </div>
           </form>
@@ -2372,11 +2413,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
           >
             <div className="px-6 py-4 border-b border-[#E2E8E2] flex items-center justify-between">
               <h3 className="font-editorial text-xl font-semibold text-[#0F1F18]">
-                {editingPhoto ? 'Edit Campus Gallery Slide' : 'Upload Campus Life Photograph'}
+                {editingPhoto ? 'Sunting Slide Galeri Kampus' : 'Unggah Foto Kehidupan Kampus'}
               </h3>
               <button
                 type="button"
                 onClick={() => setGalleryModalOpen(false)}
+                aria-label="Tutup editor galeri"
                 className="p-1.5 text-[#4A5D54] hover:text-[#0F1F18] cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -2387,13 +2429,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
               {/* Image Source Selector */}
               <div>
                 <div className="flex items-center justify-between gap-2 mb-2">
-                  <label className="text-xs font-medium text-[#0F1F18]">Photograph Source</label>
+                  <label className="text-xs font-medium text-[#0F1F18]">Sumber Foto</label>
                   <div className="inline-flex items-center gap-1 p-0.5 bg-[#F2F5F1] border border-[#D4DDD6] rounded-md">
                     {(
                       [
-                        ['upload', 'Upload File'],
-                        ['preset', 'Campus Presets'],
-                        ['url', 'Image URL'],
+                        ['upload', 'Unggah Berkas'],
+                        ['preset', 'Foto Kampus'],
+                        ['url', 'Tautan URL'],
                       ] as const
                     ).map(([mode, label]) => (
                       <button
@@ -2439,11 +2481,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                     <Upload className="w-6 h-6 text-[#0E5A36] mx-auto mb-2" />
                     <div className="text-xs font-medium text-[#0F1F18]">
                       {galleryUploadBusy
-                        ? 'Optimizing image for fast web delivery...'
-                        : 'Drag and drop a campus photo here, or browse from your device'}
+                        ? 'Mengoptimalkan gambar untuk pemuatan cepat...'
+                        : 'Seret dan lepas foto kampus di sini, atau pilih dari perangkat Anda'}
                     </div>
                     <p className="text-[11px] text-[#6B7D74] mt-1">
-                      JPG, PNG, or WebP · Automatically resized and compressed for fast carousel loading
+                      JPG, PNG, atau WebP · Ukuran otomatis dioptimalkan untuk karusel web yang cepat
                     </p>
                     <button
                       type="button"
@@ -2451,7 +2493,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                       onClick={() => galleryFileInputRef.current?.click()}
                       className="mt-3 px-4 py-1.5 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] disabled:opacity-50 rounded-lg cursor-pointer"
                     >
-                      {galleryUploadBusy ? 'Processing...' : 'Choose Image File'}
+                      {galleryUploadBusy ? 'Memproses...' : 'Pilih Berkas Gambar'}
                     </button>
                   </div>
                 )}
@@ -2489,7 +2531,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   <div>
                     <input
                       type="url"
-                      placeholder="https://example.edu/photos/campus-courtyard.jpg"
+                      placeholder="https://contoh.ac.id/foto/pelataran-kampus.jpg"
                       value={galleryForm.imageUrl.startsWith('data:') ? '' : galleryForm.imageUrl}
                       onChange={(e) =>
                         setGalleryForm((prev) => ({ ...prev, imageUrl: e.target.value }))
@@ -2497,7 +2539,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                       className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg"
                     />
                     <p className="text-[11px] text-[#6B7D74] mt-1">
-                      Enter an HTTPS image URL for a verified university photograph.
+                      Masukkan URL gambar HTTPS dari dokumentasi resmi kampus.
                     </p>
                   </div>
                 )}
@@ -2511,23 +2553,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                     <div className="aspect-[16/9] max-h-48 w-full overflow-hidden bg-[#092919]">
                       <ResilientImage
                         src={galleryForm.imageUrl}
-                        alt={galleryForm.title || 'Selected campus photograph preview'}
+                        alt={galleryForm.title || 'Pratinjau foto kampus'}
                         className="w-full h-full object-cover"
-                        fallbackTitle="Photograph Preview"
+                        fallbackTitle="Pratinjau Foto"
                       />
                     </div>
                     <div className="px-3 py-1.5 text-[11px] text-[#4A5D54] flex items-center justify-between">
                       <span>
                         {galleryForm.imageUrl.startsWith('data:image/')
-                          ? `Uploaded photo ready (${Math.round(galleryForm.imageUrl.length / 1024)} KB optimized)`
-                          : 'Preview loaded'}
+                          ? `Foto siap diunggah (${Math.round(galleryForm.imageUrl.length / 1024)} KB terkompresi)`
+                          : 'Pratinjau dimuat'}
                       </span>
                       <button
                         type="button"
                         onClick={() => setGalleryForm((prev) => ({ ...prev, imageUrl: '' }))}
                         className="text-red-700 hover:underline cursor-pointer"
                       >
-                        Clear image
+                        Hapus gambar
                       </button>
                     </div>
                   </div>
@@ -2536,7 +2578,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
 
               <div>
                 <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                  Photo Title (3–140 characters)
+                  Judul Foto (3–140 karakter)
                 </label>
                 <input
                   type="text"
@@ -2545,14 +2587,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   maxLength={140}
                   value={galleryForm.title}
                   onChange={(e) => setGalleryForm({ ...galleryForm, title: e.target.value })}
-                  placeholder="e.g. Morning Discussion at Daya Campus Courtyard"
+                  placeholder="Contoh: Diskusi Pagi di Pelataran Kampus Daya"
                   className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                  Caption (5–320 characters)
+                  Keterangan Foto (5–320 karakter)
                 </label>
                 <textarea
                   rows={3}
@@ -2561,14 +2603,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   maxLength={320}
                   value={galleryForm.caption}
                   onChange={(e) => setGalleryForm({ ...galleryForm, caption: e.target.value })}
-                  placeholder="Describe the campus scene, student activity, or academic milestone..."
+                  placeholder="Jelaskan suasana kampus, kegiatan mahasiswa, atau momen akademik..."
                   className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Category</label>
+                  <label className="block text-xs font-medium text-[#0F1F18] mb-1">Kategori</label>
                   <select
                     value={galleryForm.category}
                     onChange={(e) =>
@@ -2579,15 +2621,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                     }
                     className="w-full px-3 py-2 text-sm border border-[#D4DDD6] rounded-lg bg-white"
                   >
-                    <option value="campus">Campus Architecture</option>
-                    <option value="academics">Academics</option>
-                    <option value="student-life">Student Life</option>
-                    <option value="events">Events</option>
+                    <option value="campus">Lingkungan Kampus</option>
+                    <option value="academics">Akademik</option>
+                    <option value="student-life">Kemahasiswaan</option>
+                    <option value="events">Kegiatan</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    Photographer / Credit
+                    Fotografer / Kredit
                   </label>
                   <input
                     type="text"
@@ -2603,7 +2645,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-[#0F1F18] mb-1">
-                    Slide Order
+                    Urutan Slide
                   </label>
                   <input
                     type="number"
@@ -2629,7 +2671,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                   onChange={(e) => setGalleryForm({ ...galleryForm, active: e.target.checked })}
                   className="accent-[#0E5A36]"
                 />
-                Publish this photograph in the public landing page carousel
+                Tampilkan foto ini pada karusel galeri halaman utama
               </label>
             </div>
 
@@ -2639,14 +2681,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToPortal }
                 onClick={() => setGalleryModalOpen(false)}
                 className="px-4 py-2 text-xs font-medium text-[#4A5D54] cursor-pointer"
               >
-                Cancel
+                Batal
               </button>
               <button
                 type="submit"
                 disabled={busy || galleryUploadBusy}
                 className="px-5 py-2 text-xs font-semibold text-white bg-[#0E5A36] hover:bg-[#093E25] disabled:opacity-50 rounded-lg cursor-pointer"
               >
-                {busy ? 'Saving...' : editingPhoto ? 'Update Slide' : 'Publish to Carousel'}
+                {busy ? 'Menyimpan...' : editingPhoto ? 'Perbarui Slide' : 'Terbitkan ke Karusel'}
               </button>
             </div>
           </form>
